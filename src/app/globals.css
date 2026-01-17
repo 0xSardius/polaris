@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 33% 7%;
+    --foreground: 240 20% 96%;
+    --card: 240 38% 12%;
+    --card-foreground: 240 20% 96%;
+    --primary: 43 96% 56%;
+    --primary-foreground: 240 33% 7%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 240 20% 96%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 209 52% 25%;
+    --accent-foreground: 240 20% 96%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 43 96% 56%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  /* Heat map cell states */
+  .heat-cold {
+    @apply bg-heat-cold/50 text-slate-400;
+  }
+  
+  .heat-warming {
+    @apply bg-heat-warming/50 text-blue-300;
+  }
+  
+  .heat-warm {
+    @apply bg-heat-warm/70 text-amber-200;
+  }
+  
+  .heat-hot {
+    @apply bg-heat-hot/80 text-white;
+  }
+  
+  .heat-fire {
+    @apply bg-gradient-to-br from-amber-400 to-orange-500 text-white animate-pulse-slow;
+  }
+
+  /* Mandala grid */
+  .mandala-grid {
+    @apply grid grid-cols-9 gap-0.5 p-2 bg-slate-900/50 rounded-xl;
+  }
+
+  .mandala-cell {
+    @apply aspect-square rounded-sm flex items-center justify-center;
+    @apply text-[0.5rem] sm:text-[0.625rem] p-0.5 sm:p-1 text-center leading-tight;
+    @apply cursor-pointer transition-all duration-200;
+    @apply hover:scale-105 hover:z-10;
+  }
+
+  .mandala-cell-goal {
+    @apply text-xs sm:text-sm font-semibold;
+    @apply bg-gradient-to-br from-amber-400/20 to-orange-500/20;
+    @apply border border-amber-400/50;
+  }
+
+  .mandala-cell-pillar {
+    @apply text-[0.5rem] sm:text-xs font-medium;
+    @apply border border-slate-600/30;
+  }
+
+  /* Chat bubbles */
+  .chat-bubble-ai {
+    @apply bg-card rounded-2xl rounded-tl-sm px-4 py-3;
+    @apply text-foreground;
+  }
+
+  .chat-bubble-user {
+    @apply bg-primary/20 rounded-2xl rounded-tr-sm px-4 py-3;
+    @apply text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #1e293b transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #1e293b;
+    border-radius: 3px;
+  }
+}
