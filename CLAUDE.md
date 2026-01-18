@@ -86,3 +86,8 @@ Copy `.env.example` to `.env.local`. Required:
 - `NEXT_PUBLIC_CONVEX_URL`
 - `ANTHROPIC_API_KEY`
 - `OPIK_API_KEY`, `OPIK_WORKSPACE`, `OPIK_PROJECT_NAME`
+
+## Git
+
+- Remote is configured; pushing is allowed
+- Do not add "Co-Authored-By" lines to commit messages
