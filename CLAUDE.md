@@ -2,6 +2,41 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Current Status
+
+See `SCRATCHPAD.md` for build progress and session notes.
+
+## Known Issues (Codebase Review - Jan 2026)
+
+### Critical: Missing Core Files
+These files are referenced but not yet created:
+- `convex/users.ts` — User sync mutations
+- `convex/goals.ts` — Goal CRUD operations
+- `src/middleware.ts` — Clerk authentication middleware
+- `src/app/api/chat/route.ts` — AI chat endpoint
+- `src/app/(auth)/sign-in/[[...sign-in]]/page.tsx` — Clerk sign-in
+- `src/app/(auth)/sign-up/[[...sign-up]]/page.tsx` — Clerk sign-up
+- `src/app/(main)/layout.tsx` — Main app layout with sidebar
+- `src/app/(main)/dashboard/page.tsx` — Dashboard page
+- `src/app/(main)/craft/page.tsx` — Goal crafting page
+- `src/components/chat/*.tsx` — Chat components (ChatMessage, ChatInput, ChatInterface)
+- `src/components/mandala/MiniMap.tsx` — Heat map visualization
+- `src/lib/opik/client.ts` — Observability integration
+- `docs/PRD.md` — Full product requirements document
+
+### High: Configuration Issues
+- **ESLint version mismatch:** `eslint-config-next` is v16.x but Next.js is v15.x — update to `^15.1.6`
+- **Missing `.env.example`:** Was deleted, needs recreation for onboarding
+- **Convex URL placeholder:** `.env.local` has placeholder value for `NEXT_PUBLIC_CONVEX_URL`
+
+### Medium: Logic Inconsistency
+- **Action mapping parser mismatch:** `ACTION_MAPPING_PROMPT` in `src/lib/ai/prompts.ts` expects JSON response format, but `parseActionMapping()` in `src/lib/utils.ts` looks for text markers (`---MAPPING---`). Need to standardize on one approach.
+
+### Low: Cleanup
+- **Autoprefixer:** Can be removed from devDependencies (Tailwind v4 handles this internally)
+- **TypeScript target:** Consider updating from ES2017 to ES2020+ in `tsconfig.json`
+- **Git line endings:** Add `.gitattributes` with `* text=auto eol=lf` for cross-platform consistency
+
 ## Project Overview
 
 Polaris is an AI-powered goal coaching app for the Encode Club "Commit To Change" Hackathon. Users transform resolutions into 64 trackable daily actions using the Ohtani/Harada Method (9x9 mandala grid: 1 goal → 8 pillars → 64 actions).
@@ -22,12 +57,12 @@ npm run lint         # ESLint
 ## Architecture
 
 ### Tech Stack
-- **Framework:** Next.js 14 with App Router
+- **Framework:** Next.js 15 with App Router (React 19)
 - **Database:** Convex (real-time subscriptions)
 - **Auth:** Clerk (wraps app in `src/app/layout.tsx`)
 - **AI:** Claude via Vercel AI SDK (`@ai-sdk/anthropic`, `ai` packages)
 - **Observability:** Opik by Comet
-- **Styling:** Tailwind CSS with custom theme in `tailwind.config.ts`
+- **Styling:** Tailwind CSS v4 with theme defined in `src/app/globals.css` (using `@theme` directive)
 
 ### Data Flow
 1. Clerk handles auth → user synced to Convex `users` table
@@ -57,7 +92,8 @@ Prompts use structured markers for parsing:
 ### Heat System
 Heat levels: `cold` → `warming` → `warm` → `hot` → `fire`
 - Calculated from days since activity + streak length
-- Colors defined in `tailwind.config.ts` under `theme.extend.colors.heat`
+- Colors defined in `src/app/globals.css` under `@theme` (e.g., `--color-heat-cold`)
+- CSS classes: `.heat-cold`, `.heat-warming`, `.heat-warm`, `.heat-hot`, `.heat-fire`
 - Utility functions in `src/lib/utils.ts`: `getHeatLevel()`, `getHeatColor()`, `getHeatScore()`
 
 ## Key Patterns

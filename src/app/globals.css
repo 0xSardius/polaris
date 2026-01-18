@@ -1,111 +1,188 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 240 33% 7%;
-    --foreground: 240 20% 96%;
-    --card: 240 38% 12%;
-    --card-foreground: 240 20% 96%;
-    --primary: 43 96% 56%;
-    --primary-foreground: 240 33% 7%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 240 20% 96%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 209 52% 25%;
-    --accent-foreground: 240 20% 96%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 43 96% 56%;
-    --radius: 0.5rem;
-  }
+@theme {
+  /* Base - Night Sky Theme */
+  --color-background: #0a0a1a;
+  --color-foreground: #f0f0f5;
 
-  * {
-    @apply border-border;
-  }
+  /* Card */
+  --color-card: #12122a;
+  --color-card-foreground: #f0f0f5;
 
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
+  /* Primary - Polaris Gold */
+  --color-primary: #fbbf24;
+  --color-primary-foreground: #0a0a1a;
+
+  /* Secondary */
+  --color-secondary: #1e293b;
+  --color-secondary-foreground: #f0f0f5;
+
+  /* Muted */
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+
+  /* Accent */
+  --color-accent: #1e3a5f;
+  --color-accent-foreground: #f0f0f5;
+
+  /* Heat Map Colors */
+  --color-heat-cold: #334155;
+  --color-heat-warming: #1e3a5f;
+  --color-heat-warm: #b45309;
+  --color-heat-hot: #f59e0b;
+  --color-heat-fire: #fbbf24;
+
+  /* Status */
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-error: #ef4444;
+
+  /* Border & Input */
+  --color-border: #1e293b;
+  --color-input: #1e293b;
+  --color-ring: #fbbf24;
+
+  /* Animations */
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
 }
 
-@layer components {
-  /* Heat map cell states */
-  .heat-cold {
-    @apply bg-heat-cold/50 text-slate-400;
-  }
-  
-  .heat-warming {
-    @apply bg-heat-warming/50 text-blue-300;
-  }
-  
-  .heat-warm {
-    @apply bg-heat-warm/70 text-amber-200;
-  }
-  
-  .heat-hot {
-    @apply bg-heat-hot/80 text-white;
-  }
-  
-  .heat-fire {
-    @apply bg-gradient-to-br from-amber-400 to-orange-500 text-white animate-pulse-slow;
-  }
+@keyframes glow {
+  0% { box-shadow: 0 0 5px #fbbf24, 0 0 10px #fbbf24; }
+  100% { box-shadow: 0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #fbbf24; }
+}
 
-  /* Mandala grid */
-  .mandala-grid {
-    @apply grid grid-cols-9 gap-0.5 p-2 bg-slate-900/50 rounded-xl;
-  }
+/* Base styles */
+* {
+  border-color: var(--color-border);
+}
 
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Heat map cell states */
+.heat-cold {
+  background-color: color-mix(in srgb, var(--color-heat-cold) 50%, transparent);
+  color: #94a3b8;
+}
+
+.heat-warming {
+  background-color: color-mix(in srgb, var(--color-heat-warming) 50%, transparent);
+  color: #93c5fd;
+}
+
+.heat-warm {
+  background-color: color-mix(in srgb, var(--color-heat-warm) 70%, transparent);
+  color: #fde68a;
+}
+
+.heat-hot {
+  background-color: color-mix(in srgb, var(--color-heat-hot) 80%, transparent);
+  color: white;
+}
+
+.heat-fire {
+  background: linear-gradient(to bottom right, #fbbf24, #f97316);
+  color: white;
+  animation: var(--animate-pulse-slow);
+}
+
+/* Mandala grid */
+.mandala-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 0.125rem;
+  padding: 0.5rem;
+  background-color: color-mix(in srgb, #0f172a 50%, transparent);
+  border-radius: 0.75rem;
+}
+
+.mandala-cell {
+  aspect-ratio: 1;
+  border-radius: 0.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  padding: 0.125rem;
+  text-align: center;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mandala-cell:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+@media (min-width: 640px) {
   .mandala-cell {
-    @apply aspect-square rounded-sm flex items-center justify-center;
-    @apply text-[0.5rem] sm:text-[0.625rem] p-0.5 sm:p-1 text-center leading-tight;
-    @apply cursor-pointer transition-all duration-200;
-    @apply hover:scale-105 hover:z-10;
-  }
-
-  .mandala-cell-goal {
-    @apply text-xs sm:text-sm font-semibold;
-    @apply bg-gradient-to-br from-amber-400/20 to-orange-500/20;
-    @apply border border-amber-400/50;
-  }
-
-  .mandala-cell-pillar {
-    @apply text-[0.5rem] sm:text-xs font-medium;
-    @apply border border-slate-600/30;
-  }
-
-  /* Chat bubbles */
-  .chat-bubble-ai {
-    @apply bg-card rounded-2xl rounded-tl-sm px-4 py-3;
-    @apply text-foreground;
-  }
-
-  .chat-bubble-user {
-    @apply bg-primary/20 rounded-2xl rounded-tr-sm px-4 py-3;
-    @apply text-foreground;
+    font-size: 0.625rem;
+    padding: 0.25rem;
   }
 }
 
-@layer utilities {
-  /* Custom scrollbar */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: #1e293b transparent;
-  }
+.mandala-cell-goal {
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: linear-gradient(to bottom right, color-mix(in srgb, #fbbf24 20%, transparent), color-mix(in srgb, #f97316 20%, transparent));
+  border: 1px solid color-mix(in srgb, #fbbf24 50%, transparent);
+}
 
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
+@media (min-width: 640px) {
+  .mandala-cell-goal {
+    font-size: 0.875rem;
   }
+}
 
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
+.mandala-cell-pillar {
+  font-size: 0.5rem;
+  font-weight: 500;
+  border: 1px solid color-mix(in srgb, #475569 30%, transparent);
+}
 
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: #1e293b;
-    border-radius: 3px;
+@media (min-width: 640px) {
+  .mandala-cell-pillar {
+    font-size: 0.75rem;
   }
+}
+
+/* Chat bubbles */
+.chat-bubble-ai {
+  background-color: var(--color-card);
+  border-radius: 1rem;
+  border-top-left-radius: 0.125rem;
+  padding: 0.75rem 1rem;
+  color: var(--color-foreground);
+}
+
+.chat-bubble-user {
+  background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border-radius: 1rem;
+  border-top-right-radius: 0.125rem;
+  padding: 0.75rem 1rem;
+  color: var(--color-foreground);
+}
+
+/* Custom scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #1e293b;
+  border-radius: 3px;
 }
