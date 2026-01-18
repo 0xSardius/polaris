@@ -15,14 +15,14 @@ Current Phase: **Week 1 - Foundation + Goal Crafting**
 - [ ] Deploy to Vercel
 
 ### Day 3-4: Auth + Dashboard Shell
-- [ ] Create sign-in page: `src/app/(auth)/sign-in/[[...sign-in]]/page.tsx`
-- [ ] Create sign-up page: `src/app/(auth)/sign-up/[[...sign-up]]/page.tsx`
-- [ ] Create auth layout: `src/app/(auth)/layout.tsx`
-- [ ] Create main layout with sidebar: `src/app/(main)/layout.tsx`
-- [ ] Create dashboard page: `src/app/(main)/dashboard/page.tsx`
-- [ ] Create Convex users functions: `convex/users.ts`
-- [ ] Create Clerk middleware: `src/middleware.ts`
-- [ ] Sync Clerk user to Convex on sign-in
+- [x] Create sign-in page: `src/app/(auth)/sign-in/[[...sign-in]]/page.tsx`
+- [x] Create sign-up page: `src/app/(auth)/sign-up/[[...sign-up]]/page.tsx`
+- [x] Create auth layout: `src/app/(auth)/layout.tsx`
+- [x] Create main layout with sidebar: `src/app/(main)/layout.tsx`
+- [x] Create dashboard page: `src/app/(main)/dashboard/page.tsx`
+- [x] Create Convex users functions: `convex/users.ts`
+- [x] Create Clerk middleware: `src/middleware.ts`
+- [x] Sync Clerk user to Convex on sign-in (via `UserSync` component)
 
 ### Day 5-7: Goal Crafting Chat
 - [ ] Build ChatMessage component: `src/components/chat/ChatMessage.tsx`
