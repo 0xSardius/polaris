@@ -25,15 +25,15 @@ Current Phase: **Week 1 - Foundation + Goal Crafting**
 - [x] Sync Clerk user to Convex on sign-in (via `UserSync` component)
 
 ### Day 5-7: Goal Crafting Chat
-- [ ] Build ChatMessage component: `src/components/chat/ChatMessage.tsx`
-- [ ] Build ChatInput component: `src/components/chat/ChatInput.tsx`
-- [ ] Build ChatInterface component: `src/components/chat/ChatInterface.tsx`
-- [ ] Create barrel export: `src/components/chat/index.ts`
-- [ ] Create chat API route: `src/app/api/chat/route.ts`
-- [ ] Wire up `GOAL_CRAFTING_PROMPT`
-- [ ] Create Convex goals functions: `convex/goals.ts`
-- [ ] Parse `---GOAL_CONFIRMED---` from AI response → save goal
-- [ ] Build craft page: `src/app/(main)/craft/page.tsx`
+- [x] Build ChatMessage component: `src/components/chat/ChatMessage.tsx`
+- [x] Build ChatInput component: `src/components/chat/ChatInput.tsx`
+- [x] Build ChatInterface component: `src/components/chat/ChatInterface.tsx`
+- [x] Create barrel export: `src/components/chat/index.ts`
+- [x] Create chat API route: `src/app/api/chat/route.ts`
+- [x] Wire up `GOAL_CRAFTING_PROMPT`
+- [x] Create Convex goals functions: `convex/goals.ts`
+- [x] Parse `---GOAL_CONFIRMED---` from AI response → save goal
+- [x] Build craft page: `src/app/(main)/craft/page.tsx`
 - [ ] Build mini-map preview: `src/components/mandala/MiniMap.tsx`
 - [ ] Add basic Opik tracing: `src/lib/opik/client.ts`
 
