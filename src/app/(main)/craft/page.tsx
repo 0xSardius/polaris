@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 import { ChatInterface } from "@/components/chat";
 import { useRouter } from "next/navigation";
 import { CheckCircle, Target } from "lucide-react";
