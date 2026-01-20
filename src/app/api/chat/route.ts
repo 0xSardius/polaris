@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     systemPrompt = GOAL_CRAFTING_PROMPT;
   }
 
-  const result = streamText({
+  const result = await streamText({
     model: anthropic("claude-sonnet-4-5"),
     system: systemPrompt,
     messages,
