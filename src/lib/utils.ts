@@ -143,12 +143,31 @@ export function parseActionConfirmation(response: string): { action: string; pos
 
 export function parseActionMapping(response: string): { actions: string[]; confidence: number } | null {
   const match = response.match(/---MAPPING---\s*actions:\s*(.+)\s*confidence:\s*([\d.]+)/i);
-  
+
   if (match) {
     const actionsStr = match[1].trim();
     const actions = actionsStr === "none" ? [] : actionsStr.split(",").map(s => s.trim());
     const confidence = parseFloat(match[2]);
     return { actions, confidence };
+  }
+  return null;
+}
+
+export function parsePillarsConfirmation(response: string): string[] | null {
+  const match = response.match(/---PILLARS_CONFIRMED---\s*pillars:\s*(.+)/i);
+
+  if (match) {
+    const pillarsStr = match[1].trim();
+    // Split by comma, handling potential brackets
+    const pillars = pillarsStr
+      .replace(/^\[|\]$/g, "") // Remove surrounding brackets if present
+      .split(",")
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    if (pillars.length === 8) {
+      return pillars;
+    }
   }
   return null;
 }

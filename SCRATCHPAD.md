@@ -49,4 +49,12 @@ _Use this section for decisions, blockers, or context to preserve between sessio
 - Fixed Tailwind CSS v4 configuration (migrated from v3 syntax)
 - Updated `globals.css` to use `@import "tailwindcss"` and `@theme` directive
 - Ran comprehensive codebase review — findings added to CLAUDE.md under "Known Issues"
-- Next session: Start with auth pages (Day 3-4 tasks) after fixing ESLint version
+
+### Session: Jan 20, 2026
+- Completed Day 3-4: Auth + Dashboard Shell
+- Completed Day 5-7: Goal Crafting Chat
+- Fixed AI SDK v6 compatibility (message format conversion, sendMessage API)
+- Added AI SDK skills rule and AI Coach UX design rules to CLAUDE.md
+- Started Week 2: Pillars flow with batch suggestion UX
+- Created PILLAR_SUGGESTION_PROMPT for better UX (suggest all 8, user accepts/tweaks)
+- Built pillars page with chat interface and confirmation flow

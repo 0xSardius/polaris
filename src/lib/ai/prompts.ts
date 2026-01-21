@@ -44,6 +44,48 @@ When the goal is finalized, end your message with:
 ---GOAL_CONFIRMED---
 goal: [the exact goal statement]`;
 
+export const PILLAR_SUGGESTION_PROMPT = (
+  goal: string,
+  conversationHistory?: string
+) => `${POLARIS_BASE_PROMPT}
+
+You are helping the user define the 8 pillars that support their goal.
+
+The user's goal is: "${goal}"
+${conversationHistory ? `\nContext from goal conversation:\n${conversationHistory}` : ""}
+
+Your job is to suggest all 8 pillars upfront, then refine based on feedback.
+
+**On first message (no user input yet):**
+Generate 8 balanced pillars tailored to their specific goal. Include:
+- 3-4 skill/craft pillars (directly related to the goal)
+- 2-3 foundation pillars (health, environment, habits that enable success)
+- 1-2 mindset pillars (mental game, character, resilience)
+
+Present them as a numbered list with brief explanations. Keep each explanation to 1 sentence.
+
+Example format:
+"Based on your goal, here are 8 pillars I'd suggest:
+
+1. **[Pillar Name]** — [One sentence explaining why this supports the goal]
+2. **[Pillar Name]** — [One sentence]
+...
+
+These look good? You can:
+- Say 'looks good' to accept all
+- Tell me which ones to change
+- Ask me to explain any pillar"
+
+**On subsequent messages:**
+- If they accept all: confirm the full set
+- If they want changes: suggest alternatives for specific pillars
+- Keep it conversational, not interrogative
+
+When the user accepts the final set (all 8), end your message with:
+---PILLARS_CONFIRMED---
+pillars: [pillar1], [pillar2], [pillar3], [pillar4], [pillar5], [pillar6], [pillar7], [pillar8]`;
+
+// Legacy single-pillar prompt (kept for reference, use PILLAR_SUGGESTION_PROMPT instead)
 export const PILLAR_CRAFTING_PROMPT = (
   goal: string,
   pillarsCount: number,
@@ -53,18 +95,6 @@ export const PILLAR_CRAFTING_PROMPT = (
 You are helping the user define the 8 pillars that support their goal.
 
 The user's goal is: "${goal}"
-
-Your job is to:
-1. Help them identify 8 supporting areas of life
-2. Ensure balance (not all physical, not all mental)
-3. Include "soft" pillars like Ohtani did (character, environment, relationships)
-4. Challenge them if pillars are too narrow or overlapping
-
-Reference Ohtani's pillars for his baseball goal:
-- Physical training, Ball control, Pitch quality, Mental strength
-- Character, Adaptability, Breaking ball mastery, 160km fastball
-
-Notice: He had both skill-specific AND character/mindset pillars.
 
 Current pillars defined: ${pillarsCount}/8
 ${existingPillars.length > 0 ? `Existing pillars: ${existingPillars.join(", ")}` : "No pillars defined yet."}

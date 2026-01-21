@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { ChatInterface } from "@/components/chat";
 import { useRouter } from "next/navigation";
-import { CheckCircle, Target } from "lucide-react";
+import { CheckCircle, Target, ArrowRight } from "lucide-react";
 
 const INITIAL_MESSAGE = `Welcome! I'm Polaris, your AI goal coach.
 
@@ -24,9 +24,16 @@ export default function CraftPage() {
     try {
       const goalId = await createGoal({ title: goalTitle });
       await updateStep({ goalId, step: "pillars" });
-      // For now, just show success - pillars page coming later
+      // Navigate to pillars page
+      router.push(`/pillars?goalId=${goalId}`);
     } catch (error) {
       console.error("Failed to save goal:", error);
+    }
+  };
+
+  const handleContinueToPillars = () => {
+    if (craftingGoal?._id) {
+      router.push(`/pillars?goalId=${craftingGoal._id}`);
     }
   };
 
@@ -60,11 +67,22 @@ export default function CraftPage() {
       {/* Show confirmed goal if exists */}
       {craftingGoal && (
         <div className="mb-4 p-4 bg-card rounded-lg border border-primary/30">
-          <div className="flex items-center gap-2 text-primary mb-1">
-            <CheckCircle className="w-4 h-4" />
-            <span className="text-sm font-medium">Goal Confirmed</span>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-primary mb-1">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-sm font-medium">Goal Confirmed</span>
+              </div>
+              <p className="text-foreground">{craftingGoal.title}</p>
+            </div>
+            <button
+              onClick={handleContinueToPillars}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            >
+              Continue to Pillars
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
-          <p className="text-foreground">{craftingGoal.title}</p>
         </div>
       )}
 

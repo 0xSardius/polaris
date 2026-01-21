@@ -1,6 +1,9 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { streamText } from "ai";
-import { GOAL_CRAFTING_PROMPT } from "@/lib/ai/prompts";
+import {
+  GOAL_CRAFTING_PROMPT,
+  PILLAR_SUGGESTION_PROMPT,
+} from "@/lib/ai/prompts";
 
 export const maxDuration = 30;
 
@@ -8,8 +11,10 @@ export async function POST(req: Request) {
   const body = await req.json();
   const { messages: rawMessages } = body;
 
-  // In v5/v6, data comes from the message data field
+  // Extract context and additional data
   const context = body.data?.context || body.context || "goal_crafting";
+  const goal = body.data?.goal || body.goal;
+  const conversationHistory = body.data?.conversationHistory || body.conversationHistory;
 
   // Convert v6 UI messages (with parts) to model messages (with content string)
   const messages = rawMessages.map((msg: {
@@ -30,12 +35,19 @@ export async function POST(req: Request) {
   });
 
   // Select the appropriate system prompt based on context
-  let systemPrompt = GOAL_CRAFTING_PROMPT;
+  let systemPrompt: string;
 
-  // For now, we only support goal crafting
-  // TODO: Add pillar_crafting, action_crafting, check_in contexts
-  if (context === "goal_crafting") {
-    systemPrompt = GOAL_CRAFTING_PROMPT;
+  switch (context) {
+    case "pillar_crafting":
+      if (!goal) {
+        throw new Error("Goal is required for pillar crafting");
+      }
+      systemPrompt = PILLAR_SUGGESTION_PROMPT(goal, conversationHistory);
+      break;
+    case "goal_crafting":
+    default:
+      systemPrompt = GOAL_CRAFTING_PROMPT;
+      break;
   }
 
   const result = await streamText({
