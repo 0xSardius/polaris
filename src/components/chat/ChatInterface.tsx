@@ -30,10 +30,15 @@ export function ChatInterface({
   const { messages, sendMessage, status } = useChat({
     api: "/api/chat",
     initialMessages: initialMessage
-      ? [{ id: "initial", role: "assistant", content: initialMessage }]
+      ? [{
+          id: "initial",
+          role: "assistant" as const,
+          content: initialMessage,
+          parts: [{ type: "text" as const, text: initialMessage }],
+        }]
       : undefined,
     onFinish: (message) => {
-      // Get content from message - handle both v5 and v6 formats
+      // Get content from message - handle both string and parts formats
       const content =
         typeof message.content === "string"
           ? message.content
