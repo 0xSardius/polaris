@@ -1,8 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import type { Message } from "@ai-sdk/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 
@@ -26,52 +25,60 @@ export function ChatInterface({
   initialMessage,
 }: ChatInterfaceProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [input, setInput] = useState("");
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat({
-      api: "/api/chat",
-      body: { context, goalId, pillarId },
-      initialMessages: initialMessage
-        ? [{ id: "initial", role: "assistant", content: initialMessage }]
-        : undefined,
-      onFinish: (message: Message) => {
-        // Check for confirmations in the response
-        if (context === "goal_crafting" && onGoalConfirmed) {
-          const match = message.content.match(
-            /---GOAL_CONFIRMED---\s*goal:\s*(.+)/i
-          );
-          if (match) {
-            onGoalConfirmed(match[1].trim());
-          }
-        }
+  const { messages, sendMessage, status } = useChat({
+    api: "/api/chat",
+    initialMessages: initialMessage
+      ? [{ id: "initial", role: "assistant", content: initialMessage }]
+      : undefined,
+    onFinish: (message) => {
+      // Get content from message - handle both v5 and v6 formats
+      const content =
+        typeof message.content === "string"
+          ? message.content
+          : message.parts
+              ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+              .map((p) => p.text)
+              .join("") || "";
 
-        if (context === "pillar_crafting" && onPillarConfirmed) {
-          const pillarMatch = message.content.match(
-            /---PILLAR_CONFIRMED---\s*pillar:\s*(.+)/i
-          );
-          const positionMatch = message.content.match(/position:\s*(\d+)/i);
-          if (pillarMatch && positionMatch) {
-            onPillarConfirmed(
-              pillarMatch[1].trim(),
-              parseInt(positionMatch[1], 10)
-            );
-          }
+      // Check for confirmations in the response
+      if (context === "goal_crafting" && onGoalConfirmed) {
+        const match = content.match(/---GOAL_CONFIRMED---\s*goal:\s*(.+)/i);
+        if (match) {
+          onGoalConfirmed(match[1].trim());
         }
+      }
 
-        if (context === "action_crafting" && onActionConfirmed) {
-          const actionMatch = message.content.match(
-            /---ACTION_CONFIRMED---\s*action:\s*(.+)/i
+      if (context === "pillar_crafting" && onPillarConfirmed) {
+        const pillarMatch = content.match(
+          /---PILLAR_CONFIRMED---\s*pillar:\s*(.+)/i
+        );
+        const positionMatch = content.match(/position:\s*(\d+)/i);
+        if (pillarMatch && positionMatch) {
+          onPillarConfirmed(
+            pillarMatch[1].trim(),
+            parseInt(positionMatch[1], 10)
           );
-          const positionMatch = message.content.match(/position:\s*(\d+)/i);
-          if (actionMatch && positionMatch) {
-            onActionConfirmed(
-              actionMatch[1].trim(),
-              parseInt(positionMatch[1], 10)
-            );
-          }
         }
-      },
-    });
+      }
+
+      if (context === "action_crafting" && onActionConfirmed) {
+        const actionMatch = content.match(
+          /---ACTION_CONFIRMED---\s*action:\s*(.+)/i
+        );
+        const positionMatch = content.match(/position:\s*(\d+)/i);
+        if (actionMatch && positionMatch) {
+          onActionConfirmed(
+            actionMatch[1].trim(),
+            parseInt(positionMatch[1], 10)
+          );
+        }
+      }
+    },
+  });
+
+  const isLoading = status === "streaming" || status === "submitted";
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -79,6 +86,31 @@ export function ChatInterface({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim() && !isLoading) {
+      sendMessage({
+        content: input,
+        data: { context, goalId, pillarId },
+      });
+      setInput("");
+    }
+  };
+
+  // Helper to get message content
+  const getMessageContent = (message: (typeof messages)[0]): string => {
+    if (typeof message.content === "string") {
+      return message.content;
+    }
+    // v6 format with parts
+    return (
+      message.parts
+        ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+        .map((p) => p.text)
+        .join("") || ""
+    );
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -91,7 +123,7 @@ export function ChatInterface({
           <ChatMessage
             key={message.id}
             role={message.role as "user" | "assistant"}
-            content={message.content}
+            content={getMessageContent(message)}
           />
         ))}
         {isLoading && (
@@ -103,11 +135,7 @@ export function ChatInterface({
       <div className="p-4 border-t border-border">
         <ChatInput
           value={input}
-          onChange={(value) =>
-            handleInputChange({
-              target: { value },
-            } as React.ChangeEvent<HTMLTextAreaElement>)
-          }
+          onChange={setInput}
           onSubmit={handleSubmit}
           disabled={isLoading}
           placeholder={
