@@ -136,3 +136,25 @@ Copy `.env.example` to `.env.local`. Required:
 - Reviewing AI-related code for correctness
 
 These skills contain up-to-date patterns for AI SDK v5/v6 and prevent common mistakes like using deprecated APIs.
+
+### AI Coach UX Design
+Before building any new coaching flow (pillars, actions, check-ins, etc.):
+
+1. **Analyze the user flow** — Map out each step the user takes. Identify friction points and where users might drop off.
+
+2. **Design targeted prompts** — Each prompt should:
+   - Have a clear, singular purpose
+   - Guide without overwhelming
+   - Use the user's own language/context from previous steps
+   - Include examples that make the task concrete
+
+3. **Minimize user effort** — The coach should:
+   - Suggest rather than ask open-ended questions when possible
+   - Offer smart defaults the user can accept or tweak
+   - Batch related inputs (don't ask 8 separate questions for 8 pillars)
+   - Celebrate progress to maintain momentum
+
+4. **Test the conversation** — Before finalizing, simulate the full flow and ask:
+   - Does this feel like a helpful coach or an interrogation?
+   - Can a user complete this in one sitting without fatigue?
+   - Are we respecting the user's time?
