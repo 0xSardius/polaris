@@ -29,14 +29,6 @@ export function ChatInterface({
 
   const { messages, sendMessage, status } = useChat({
     api: "/api/chat",
-    initialMessages: initialMessage
-      ? [{
-          id: "initial",
-          role: "assistant" as const,
-          content: initialMessage,
-          parts: [{ type: "text" as const, text: initialMessage }],
-        }]
-      : undefined,
     onFinish: (message) => {
       // Get content from message - handle both string and parts formats
       const content =
@@ -124,6 +116,10 @@ export function ChatInterface({
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin"
       >
+        {/* Show initial welcome message if no messages yet */}
+        {initialMessage && messages.length === 0 && (
+          <ChatMessage role="assistant" content={initialMessage} />
+        )}
         {messages.map((message) => (
           <ChatMessage
             key={message.id}
