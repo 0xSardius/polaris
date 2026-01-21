@@ -27,7 +27,7 @@ export function ChatInterface({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, isLoading: hookIsLoading } = useChat({
     api: "/api/chat",
     onFinish: (message) => {
       // Get content from message - handle both string and parts formats
@@ -75,7 +75,8 @@ export function ChatInterface({
     },
   });
 
-  const isLoading = status === "streaming" || status === "submitted";
+  // Use hookIsLoading if available, otherwise check status
+  const isLoading = hookIsLoading ?? (status === "streaming" || status === "submitted" || status === "in_progress");
 
   // Auto-scroll to bottom
   useEffect(() => {
