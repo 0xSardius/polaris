@@ -8,33 +8,22 @@ See `SCRATCHPAD.md` for build progress and session notes.
 
 ## Known Issues (Codebase Review - Jan 2026)
 
-### Critical: Missing Core Files
-These files are referenced but not yet created:
-- `convex/users.ts` — User sync mutations
-- `convex/goals.ts` — Goal CRUD operations
-- `src/middleware.ts` — Clerk authentication middleware
-- `src/app/api/chat/route.ts` — AI chat endpoint
-- `src/app/(auth)/sign-in/[[...sign-in]]/page.tsx` — Clerk sign-in
-- `src/app/(auth)/sign-up/[[...sign-up]]/page.tsx` — Clerk sign-up
-- `src/app/(main)/layout.tsx` — Main app layout with sidebar
-- `src/app/(main)/dashboard/page.tsx` — Dashboard page
-- `src/app/(main)/craft/page.tsx` — Goal crafting page
-- `src/components/chat/*.tsx` — Chat components (ChatMessage, ChatInput, ChatInterface)
+### Missing Files (Week 2+)
 - `src/components/mandala/MiniMap.tsx` — Heat map visualization
 - `src/lib/opik/client.ts` — Observability integration
 - `docs/PRD.md` — Full product requirements document
+- Pillar crafting flow (pages + Convex functions)
+- Action crafting flow (pages + Convex functions)
 
-### High: Configuration Issues
+### Configuration Issues
 - **ESLint version mismatch:** `eslint-config-next` is v16.x but Next.js is v15.x — update to `^15.1.6`
 - **Missing `.env.example`:** Was deleted, needs recreation for onboarding
-- **Convex URL placeholder:** `.env.local` has placeholder value for `NEXT_PUBLIC_CONVEX_URL`
 
-### Medium: Logic Inconsistency
+### Logic Inconsistency
 - **Action mapping parser mismatch:** `ACTION_MAPPING_PROMPT` in `src/lib/ai/prompts.ts` expects JSON response format, but `parseActionMapping()` in `src/lib/utils.ts` looks for text markers (`---MAPPING---`). Need to standardize on one approach.
 
 ### Low: Cleanup
 - **Autoprefixer:** Can be removed from devDependencies (Tailwind v4 handles this internally)
-- **TypeScript target:** Consider updating from ES2017 to ES2020+ in `tsconfig.json`
 - **Git line endings:** Add `.gitattributes` with `* text=auto eol=lf` for cross-platform consistency
 
 ## Project Overview
@@ -98,12 +87,20 @@ Heat levels: `cold` → `warming` → `warm` → `hot` → `fire`
 
 ## Key Patterns
 
-### Chat with AI
+### Chat with AI (v5/v6 pattern)
 ```tsx
-import { useChat } from "ai/react";
-const { messages, input, handleInputChange, handleSubmit } = useChat({
+import { useChat } from "@ai-sdk/react";
+import { useState } from "react";
+
+const [input, setInput] = useState("");
+const { messages, sendMessage, status } = useChat({
   api: "/api/chat",
-  body: { context: "goal_crafting", goalId },
+});
+
+// Send message with data
+sendMessage({
+  content: input,
+  data: { context: "goal_crafting", goalId },
 });
 ```
 
@@ -127,3 +124,15 @@ Copy `.env.example` to `.env.local`. Required:
 
 - Remote is configured; pushing is allowed
 - Do not add "Co-Authored-By" lines to commit messages
+
+## Rules
+
+### Vercel AI SDK
+**Always use the `/ai-sdk-core` and `/ai-sdk-ui` skills** when:
+- Creating or modifying AI chat functionality
+- Working with `useChat`, `useCompletion`, or `useObject` hooks
+- Building API routes that use `streamText` or `generateText`
+- Debugging AI SDK errors
+- Reviewing AI-related code for correctness
+
+These skills contain up-to-date patterns for AI SDK v5/v6 and prevent common mistakes like using deprecated APIs.
