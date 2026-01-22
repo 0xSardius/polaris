@@ -9,6 +9,7 @@
  */
 
 import type * as goals from "../goals.js";
+import type * as pillars from "../pillars.js";
 import type * as users from "../users.js";
 
 import type {
@@ -19,6 +20,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   goals: typeof goals;
+  pillars: typeof pillars;
   users: typeof users;
 }>;
 

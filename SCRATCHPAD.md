@@ -58,3 +58,17 @@ _Use this section for decisions, blockers, or context to preserve between sessio
 - Started Week 2: Pillars flow with batch suggestion UX
 - Created PILLAR_SUGGESTION_PROMPT for better UX (suggest all 8, user accepts/tweaks)
 - Built pillars page with chat interface and confirmation flow
+
+### Session: Jan 21, 2026
+- **Major UX refactor: Single-page wizard flow**
+- Problem: Separate pages for goal/pillars/actions was fragile — relied on parsing AI markers, users missed "Continue" buttons
+- Solution: Rebuilt `/craft` as a single-page wizard with explicit user controls
+- New flow:
+  1. Goal Step: Chat + "I'm Ready to Confirm" button → user types final goal → Confirm
+  2. Pillars Step: AI auto-suggests 8 pillars → editable sidebar → user can tweak → Confirm 8 Pillars
+  3. Actions Step: (placeholder for now) → Activate Goal
+- Key improvements:
+  - User clicks buttons to advance (not waiting for AI parsing)
+  - Pillars auto-fill from AI response but are fully editable
+  - Resumes from existing crafting goal if user returns
+- Removed separate `/pillars` page (integrated into `/craft`)
