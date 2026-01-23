@@ -418,8 +418,9 @@ function PillarsStep({
   useEffect(() => {
     if (goalTitle && !hasTriggeredInitial.current && messages.length === 0) {
       hasTriggeredInitial.current = true;
+      // Include goal in message content as fallback (data passing can be unreliable)
       sendMessage({
-        content: "Please suggest 8 pillars for my goal.",
+        content: `My goal is: "${goalTitle}"\n\nPlease suggest 8 pillars to support this goal.`,
         data: {
           context: "pillar_crafting",
           goal: goalTitle,

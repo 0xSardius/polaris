@@ -11,10 +11,26 @@ export async function POST(req: Request) {
   const body = await req.json();
   const { messages: rawMessages } = body;
 
-  // Extract context and additional data
-  const context = body.data?.context || body.context || "goal_crafting";
-  const goal = body.data?.goal || body.goal;
-  const conversationHistory = body.data?.conversationHistory || body.conversationHistory;
+  // AI SDK v6 sends data in different locations depending on version/config
+  // Check multiple possible locations for the context and goal
+  const context =
+    body.data?.context ||
+    body.context ||
+    body.options?.body?.context ||
+    "goal_crafting";
+
+  const goal =
+    body.data?.goal ||
+    body.goal ||
+    body.options?.body?.goal;
+
+  const conversationHistory =
+    body.data?.conversationHistory ||
+    body.conversationHistory ||
+    body.options?.body?.conversationHistory;
+
+  // Debug logging (remove in production)
+  console.log("[Chat API] Context:", context, "| Goal:", goal ? goal.substring(0, 30) + "..." : "none");
 
   // Convert v6 UI messages (with parts) to model messages (with content string)
   const messages = rawMessages.map((msg: {
