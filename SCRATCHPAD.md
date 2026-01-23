@@ -84,3 +84,11 @@ _Items to revisit when core flow is complete._
   - Pillars auto-fill from AI response but are fully editable
   - Resumes from existing crafting goal if user returns
 - Removed separate `/pillars` page (integrated into `/craft`)
+- Fixed Clerk + Convex auth (added auth.config.ts + JWT template in Clerk dashboard)
+- Fixed goal context passing to pillars chat (include goal in message content)
+
+### Next Session Priorities
+1. **Polish pillars auto-fill** — Tune regex to match AI output format so sidebar populates automatically
+2. **Build actions step** — AI suggests 8 actions per pillar (64 total), similar batch UX to pillars
+3. **Dashboard page** — Show the mandala grid visualization with goal → pillars → actions
+4. **Check-in flow** — Natural language input mapped to actions
