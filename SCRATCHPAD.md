@@ -59,6 +59,18 @@ _Use this section for decisions, blockers, or context to preserve between sessio
 - Created PILLAR_SUGGESTION_PROMPT for better UX (suggest all 8, user accepts/tweaks)
 - Built pillars page with chat interface and confirmation flow
 
+---
+
+## Polish / Future Improvements
+
+_Items to revisit when core flow is complete._
+
+- [ ] Auto-populate pillars sidebar from AI response (regex needs tuning to match actual output format)
+- [ ] Build actions step (64 daily habits across 8 pillars)
+- [ ] Remove debug logging from chat API route before production
+
+---
+
 ### Session: Jan 21, 2026
 - **Major UX refactor: Single-page wizard flow**
 - Problem: Separate pages for goal/pillars/actions was fragile — relied on parsing AI markers, users missed "Continue" buttons
