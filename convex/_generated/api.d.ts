@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as actions from "../actions.js";
 import type * as goals from "../goals.js";
 import type * as pillars from "../pillars.js";
 import type * as users from "../users.js";
@@ -19,6 +20,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  actions: typeof actions;
   goals: typeof goals;
   pillars: typeof pillars;
   users: typeof users;

@@ -189,7 +189,7 @@ export default function CraftPage() {
       )}
 
       {step === "actions" && (
-        <ActionsStep goalTitle={goalTitle} onComplete={handleActivateGoal} />
+        <ActionsStep goalTitle={goalTitle} goalId={goalId} onComplete={handleActivateGoal} />
       )}
 
       {step === "complete" && (
@@ -578,34 +578,373 @@ function PillarsStep({
 }
 
 // =============================================================================
-// ACTIONS STEP (Simplified for now)
+// ACTIONS STEP
 // =============================================================================
 
 function ActionsStep({
   goalTitle,
+  goalId,
   onComplete,
 }: {
   goalTitle: string;
+  goalId: Id<"goals"> | null;
   onComplete: () => void;
 }) {
-  return (
-    <div className="flex-1 flex items-center justify-center">
-      <div className="text-center max-w-md">
-        <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
-          <Zap className="w-8 h-8 text-primary" />
+  const [currentPillarIndex, setCurrentPillarIndex] = useState(0);
+  const [actions, setActions] = useState<string[]>(Array(8).fill(""));
+  const [completedPillars, setCompletedPillars] = useState<Set<number>>(new Set());
+
+  // Fetch pillars for this goal
+  const pillarsData = useQuery(
+    api.pillars.getByGoalOrdered,
+    goalId ? { goalId } : "skip"
+  );
+
+  // Mutation to save actions
+  const saveActions = useMutation(api.actions.createBatch);
+
+  const currentPillar = pillarsData?.[currentPillarIndex];
+
+  // Reset actions when switching pillars
+  useEffect(() => {
+    setActions(Array(8).fill(""));
+  }, [currentPillarIndex]);
+
+  const handleConfirmActions = async () => {
+    if (!goalId || !currentPillar) return;
+    const filledActions = actions.filter((a) => a.trim());
+    if (filledActions.length !== 8) {
+      alert("Please fill in all 8 actions");
+      return;
+    }
+
+    try {
+      await saveActions({
+        pillarId: currentPillar._id,
+        goalId,
+        actions: actions.map((title) => ({ title: title.trim() })),
+      });
+
+      // Mark this pillar as complete
+      setCompletedPillars((prev) => new Set([...prev, currentPillarIndex]));
+
+      // Move to next pillar or finish
+      if (currentPillarIndex < 7) {
+        setCurrentPillarIndex(currentPillarIndex + 1);
+        setActions(Array(8).fill(""));
+      }
+    } catch (error) {
+      console.error("Failed to save actions:", error);
+    }
+  };
+
+  const allPillarsComplete = completedPillars.size === 8;
+
+  if (!pillarsData) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading pillars...</div>
+      </div>
+    );
+  }
+
+  if (allPillarsComplete) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-8 h-8 text-green-500" />
+          </div>
+          <h2 className="text-xl font-bold mb-2">All 64 Actions Defined!</h2>
+          <p className="text-muted-foreground mb-6">
+            Your mandala is complete. You're ready to start tracking your progress.
+          </p>
+          <button
+            onClick={onComplete}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors mx-auto"
+          >
+            <Sparkles className="w-4 h-4" />
+            Activate My Goal
+          </button>
         </div>
-        <h2 className="text-xl font-bold mb-2">Actions Coming Soon!</h2>
-        <p className="text-muted-foreground mb-6">
-          The actions step (64 daily habits) is still being built. For now, you
-          can activate your goal with just the pillars and add actions later.
-        </p>
-        <button
-          onClick={onComplete}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors mx-auto"
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+      {/* Pillar Progress Bar */}
+      <div className="flex gap-2">
+        {pillarsData.map((pillar, index) => (
+          <button
+            key={pillar._id}
+            onClick={() => {
+              setCurrentPillarIndex(index);
+              setActions(Array(8).fill(""));
+            }}
+            className={`flex-1 p-2 rounded-lg text-xs font-medium transition-colors ${
+              completedPillars.has(index)
+                ? "bg-green-500/20 text-green-500 border border-green-500/30"
+                : index === currentPillarIndex
+                  ? "bg-primary/20 text-primary border-2 border-primary"
+                  : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+            }`}
+          >
+            <div className="flex items-center justify-center gap-1">
+              {completedPillars.has(index) && <CheckCircle className="w-3 h-3" />}
+              <span className="truncate">{pillar.title}</span>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Current Pillar Actions */}
+      {currentPillar && (
+        <ActionEditor
+          goalTitle={goalTitle}
+          pillarTitle={currentPillar.title}
+          pillarIndex={currentPillarIndex}
+          actions={actions}
+          setActions={setActions}
+          onConfirm={handleConfirmActions}
+        />
+      )}
+    </div>
+  );
+}
+
+// =============================================================================
+// ACTION EDITOR (for a single pillar)
+// =============================================================================
+
+function ActionEditor({
+  goalTitle,
+  pillarTitle,
+  pillarIndex,
+  actions,
+  setActions,
+  onConfirm,
+}: {
+  goalTitle: string;
+  pillarTitle: string;
+  pillarIndex: number;
+  actions: string[];
+  setActions: (a: string[]) => void;
+  onConfirm: () => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [input, setInput] = useState("");
+  const hasTriggeredInitial = useRef(false);
+  const hasAutoFilled = useRef(false);
+
+  // Reset refs when pillar changes
+  useEffect(() => {
+    hasTriggeredInitial.current = false;
+    hasAutoFilled.current = false;
+  }, [pillarIndex]);
+
+  const { messages, sendMessage, status, isLoading: hookIsLoading, setMessages } = useChat({
+    api: "/api/chat",
+    id: `actions-${pillarIndex}`, // Unique chat per pillar
+    onFinish: (response) => {
+      if (hasAutoFilled.current) return;
+
+      // AI SDK v6: Get content from response.messages array
+      let content = "";
+
+      if (response.messages && Array.isArray(response.messages)) {
+        const lastAssistant = [...response.messages].reverse().find(
+          (m: { role: string }) => m.role === "assistant"
+        );
+
+        if (lastAssistant) {
+          if (lastAssistant.parts && Array.isArray(lastAssistant.parts)) {
+            content = lastAssistant.parts
+              .filter((p: { type: string; text?: string }) => p.type === "text" && p.text)
+              .map((p: { text: string }) => p.text)
+              .join("");
+          } else if (typeof lastAssistant.content === "string") {
+            content = lastAssistant.content;
+          }
+        }
+      }
+
+      // Extract actions from AI response
+      const actionsFound: string[] = [];
+      const lines = content.split("\n");
+
+      for (const line of lines) {
+        const boldMatch = line.match(/^\d+[\.\)]\s*\*\*([^*]+)\*\*/);
+        if (boldMatch && boldMatch[1]) {
+          actionsFound.push(boldMatch[1].trim());
+          continue;
+        }
+
+        const plainMatch = line.match(/^\d+[\.\)]\s+([^—\-–\n]+)/);
+        if (plainMatch && plainMatch[1]) {
+          const name = plainMatch[1].trim();
+          if (name.length > 0 && name.length < 60 && !name.includes(". ")) {
+            actionsFound.push(name);
+          }
+        }
+      }
+
+      if (actionsFound.length >= 8) {
+        hasAutoFilled.current = true;
+        setActions(actionsFound.slice(0, 8));
+      }
+    },
+  });
+
+  const isLoading =
+    hookIsLoading ??
+    (status === "streaming" ||
+      status === "submitted" ||
+      status === "in_progress");
+
+  // Auto-scroll
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Trigger initial action suggestion
+  useEffect(() => {
+    if (pillarTitle && !hasTriggeredInitial.current) {
+      hasTriggeredInitial.current = true;
+      // Clear previous messages for new pillar
+      setMessages([]);
+      setTimeout(() => {
+        sendMessage({
+          content: `My goal is: "${goalTitle}"\nPillar: "${pillarTitle}"\n\nPlease suggest 8 actions for this pillar.`,
+          data: {
+            context: "action_crafting",
+            goal: goalTitle,
+            pillar: pillarTitle,
+          },
+        });
+      }, 100);
+    }
+  }, [pillarTitle, goalTitle, sendMessage, setMessages]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim() && !isLoading) {
+      sendMessage({
+        content: input,
+        data: {
+          context: "action_crafting",
+          goal: goalTitle,
+          pillar: pillarTitle,
+        },
+      });
+      setInput("");
+    }
+  };
+
+  const handleActionChange = (index: number, value: string) => {
+    const newActions = [...actions];
+    newActions[index] = value;
+    setActions(newActions);
+  };
+
+  const getMessageContent = (message: (typeof messages)[0]): string => {
+    if (typeof message.content === "string") return message.content;
+    return (
+      message.parts
+        ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+        .map((p) => p.text)
+        .join("") || ""
+    );
+  };
+
+  const filledCount = actions.filter((a) => a.trim()).length;
+
+  return (
+    <div className="flex-1 flex gap-4 overflow-hidden">
+      {/* Left: Chat */}
+      <div className="flex-1 flex flex-col bg-card/50 rounded-xl border border-border overflow-hidden">
+        {/* Pillar header */}
+        <div className="p-3 border-b border-border bg-card">
+          <div className="flex items-center gap-2 text-sm">
+            <Zap className="w-4 h-4 text-primary" />
+            <span className="text-muted-foreground">Defining actions for:</span>
+            <span className="font-medium">{pillarTitle}</span>
+          </div>
+        </div>
+
+        <div
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin"
         >
-          <Sparkles className="w-4 h-4" />
-          Activate My Goal
-        </button>
+          {messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              role={message.role as "user" | "assistant"}
+              content={getMessageContent(message)}
+            />
+          ))}
+          {isLoading && (
+            <ChatMessage role="assistant" content="" isLoading={true} />
+          )}
+        </div>
+
+        <div className="p-4 border-t border-border">
+          <ChatInput
+            value={input}
+            onChange={setInput}
+            onSubmit={handleSubmit}
+            disabled={isLoading}
+            placeholder="Ask to change actions, get explanations, or refine..."
+          />
+        </div>
+      </div>
+
+      {/* Right: Actions Editor */}
+      <div className="w-80 flex flex-col bg-card rounded-xl border border-border overflow-hidden">
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              8 Actions
+            </h3>
+            <span className="text-sm text-muted-foreground">
+              {filledCount}/8
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Daily habits for "{pillarTitle}"
+          </p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {actions.map((action, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-xs font-medium">
+                {index + 1}
+              </span>
+              <input
+                type="text"
+                value={action}
+                onChange={(e) => handleActionChange(index, e.target.value)}
+                placeholder={`Action ${index + 1}...`}
+                className="flex-1 px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="p-4 border-t border-border">
+          <button
+            onClick={onConfirm}
+            disabled={filledCount !== 8}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <CheckCircle className="w-4 h-4" />
+            Confirm 8 Actions
+          </button>
+        </div>
       </div>
     </div>
   );

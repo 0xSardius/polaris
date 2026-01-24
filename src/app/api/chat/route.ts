@@ -3,6 +3,7 @@ import { streamText } from "ai";
 import {
   GOAL_CRAFTING_PROMPT,
   PILLAR_SUGGESTION_PROMPT,
+  ACTION_SUGGESTION_PROMPT,
 } from "@/lib/ai/prompts";
 
 export const maxDuration = 30;
@@ -24,13 +25,18 @@ export async function POST(req: Request) {
     body.goal ||
     body.options?.body?.goal;
 
+  const pillar =
+    body.data?.pillar ||
+    body.pillar ||
+    body.options?.body?.pillar;
+
   const conversationHistory =
     body.data?.conversationHistory ||
     body.conversationHistory ||
     body.options?.body?.conversationHistory;
 
   // Debug logging (remove in production)
-  console.log("[Chat API] Context:", context, "| Goal:", goal ? goal.substring(0, 30) + "..." : "none");
+  console.log("[Chat API] Context:", context, "| Goal:", goal ? goal.substring(0, 30) + "..." : "none", "| Pillar:", pillar || "none");
 
   // Convert v6 UI messages (with parts) to model messages (with content string)
   const messages = rawMessages.map((msg: {
@@ -59,6 +65,12 @@ export async function POST(req: Request) {
         throw new Error("Goal is required for pillar crafting");
       }
       systemPrompt = PILLAR_SUGGESTION_PROMPT(goal, conversationHistory);
+      break;
+    case "action_crafting":
+      if (!goal || !pillar) {
+        throw new Error("Goal and pillar are required for action crafting");
+      }
+      systemPrompt = ACTION_SUGGESTION_PROMPT(goal, pillar);
       break;
     case "goal_crafting":
     default:
