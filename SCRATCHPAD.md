@@ -65,7 +65,7 @@ _Use this section for decisions, blockers, or context to preserve between sessio
 
 _Items to revisit when core flow is complete._
 
-- [ ] Auto-populate pillars sidebar from AI response (regex needs tuning to match actual output format)
+- [x] Auto-populate pillars sidebar from AI response (fixed: AI SDK v6 uses response.messages array)
 - [ ] Build actions step (64 daily habits across 8 pillars)
 - [ ] Remove debug logging from chat API route before production
 

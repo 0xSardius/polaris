@@ -365,38 +365,65 @@ function PillarsStep({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   const hasTriggeredInitial = useRef(false);
+  const hasAutoFilled = useRef(false);
 
   const { messages, sendMessage, status, isLoading: hookIsLoading } = useChat({
     api: "/api/chat",
-    onFinish: (message) => {
-      // Try to extract suggested pillars from AI response
-      const content =
-        typeof message.content === "string"
-          ? message.content
-          : message.parts
-              ?.filter(
-                (p): p is { type: "text"; text: string } => p.type === "text"
-              )
-              .map((p) => p.text)
-              .join("") || "";
+    onFinish: (response) => {
+      // Only auto-fill once (on first AI response)
+      if (hasAutoFilled.current) return;
 
-      // Look for numbered list pattern (1. **Name** or 1. Name)
-      const pillarMatches = content.match(
-        /\d+\.\s+\*?\*?([^*\n—-]+)\*?\*?(?:\s*[—-]|$)/gm
-      );
-      if (pillarMatches && pillarMatches.length >= 8) {
-        const extracted = pillarMatches.slice(0, 8).map((match) => {
-          // Clean up the match to get just the pillar name
-          return match
-            .replace(/^\d+\.\s+/, "")
-            .replace(/\*\*/g, "")
-            .replace(/\s*[—-].*$/, "")
-            .trim();
-        });
-        // Only auto-fill if pillars are empty
-        if (pillars.every((p) => !p.trim())) {
-          setPillars(extracted);
+      // AI SDK v6: Get content from response.messages array
+      let content = "";
+
+      if (response.messages && Array.isArray(response.messages)) {
+        const lastAssistant = [...response.messages].reverse().find(
+          (m: { role: string }) => m.role === "assistant"
+        );
+
+        if (lastAssistant) {
+          // v6 format: check parts array first
+          if (lastAssistant.parts && Array.isArray(lastAssistant.parts)) {
+            content = lastAssistant.parts
+              .filter((p: { type: string; text?: string }) => p.type === "text" && p.text)
+              .map((p: { text: string }) => p.text)
+              .join("");
+          }
+          // Fallback to content string
+          else if (typeof lastAssistant.content === "string") {
+            content = lastAssistant.content;
+          }
         }
+      }
+
+      // Extract pillars from AI response
+      // Expected format: "1. **Pillar Name** — explanation" or "1. Pillar Name - explanation"
+      const pillarsFound: string[] = [];
+      const lines = content.split("\n");
+
+      for (const line of lines) {
+        // Match: "1. **Name**" or "1. Name" with optional explanation after dash
+        const boldMatch = line.match(/^\d+[\.\)]\s*\*\*([^*]+)\*\*/);
+        if (boldMatch && boldMatch[1]) {
+          pillarsFound.push(boldMatch[1].trim());
+          continue;
+        }
+
+        // Fallback: "1. Name — explanation" or "1. Name - explanation"
+        const plainMatch = line.match(/^\d+[\.\)]\s+([^—\-–\n]+)/);
+        if (plainMatch && plainMatch[1]) {
+          const name = plainMatch[1].trim();
+          // Skip if it looks like a full sentence (explanation, not pillar name)
+          if (name.length > 0 && name.length < 40 && !name.includes(".")) {
+            pillarsFound.push(name);
+          }
+        }
+      }
+
+      // Auto-fill if we found at least 8 pillars
+      if (pillarsFound.length >= 8) {
+        hasAutoFilled.current = true;
+        setPillars(pillarsFound.slice(0, 8));
       }
     },
   });
