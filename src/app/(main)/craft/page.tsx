@@ -734,20 +734,16 @@ function ActionEditor({
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
-  const hasTriggeredInitial = useRef(false);
-  const hasAutoFilled = useRef(false);
-
-  // Reset refs when pillar changes
-  useEffect(() => {
-    hasTriggeredInitial.current = false;
-    hasAutoFilled.current = false;
-  }, [pillarIndex]);
+  // Track which pillar we've triggered for (guards against Strict Mode double-invocation)
+  const triggeredForPillarRef = useRef<number | null>(null);
+  const autoFilledForPillarRef = useRef<number | null>(null);
 
   const { messages, sendMessage, status, isLoading: hookIsLoading, setMessages } = useChat({
     api: "/api/chat",
     id: `actions-${pillarIndex}`, // Unique chat per pillar
     onFinish: (response) => {
-      if (hasAutoFilled.current) return;
+      // Only auto-fill once per pillar
+      if (autoFilledForPillarRef.current === pillarIndex) return;
 
       // AI SDK v6: Get content from response.messages array
       let content = "";
@@ -790,7 +786,7 @@ function ActionEditor({
       }
 
       if (actionsFound.length >= 8) {
-        hasAutoFilled.current = true;
+        autoFilledForPillarRef.current = pillarIndex;
         setActions(actionsFound.slice(0, 8));
       }
     },
@@ -809,24 +805,27 @@ function ActionEditor({
     }
   }, [messages]);
 
-  // Trigger initial action suggestion
+  // Trigger initial action suggestion (guards against React Strict Mode double-invocation)
   useEffect(() => {
-    if (pillarTitle && !hasTriggeredInitial.current) {
-      hasTriggeredInitial.current = true;
-      // Clear previous messages for new pillar
-      setMessages([]);
-      setTimeout(() => {
-        sendMessage({
-          content: `My goal is: "${goalTitle}"\nPillar: "${pillarTitle}"\n\nPlease suggest 8 actions for this pillar.`,
-          data: {
-            context: "action_crafting",
-            goal: goalTitle,
-            pillar: pillarTitle,
-          },
-        });
-      }, 100);
+    // Only trigger if we haven't already triggered for this specific pillar
+    if (!pillarTitle || triggeredForPillarRef.current === pillarIndex) {
+      return;
     }
-  }, [pillarTitle, goalTitle, sendMessage, setMessages]);
+
+    // Mark this pillar as triggered immediately (before any async work)
+    triggeredForPillarRef.current = pillarIndex;
+
+    // Clear previous messages and send new request
+    setMessages([]);
+    sendMessage({
+      content: `My goal is: "${goalTitle}"\nPillar: "${pillarTitle}"\n\nPlease suggest 8 actions for this pillar.`,
+      data: {
+        context: "action_crafting",
+        goal: goalTitle,
+        pillar: pillarTitle,
+      },
+    });
+  }, [pillarIndex, pillarTitle, goalTitle, sendMessage, setMessages]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
