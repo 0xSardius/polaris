@@ -816,9 +816,10 @@ function ActionEditor({
     triggeredForPillarRef.current = pillarIndex;
 
     // Clear previous messages and send new request
+    // Keep user message minimal - system prompt has all context
     setMessages([]);
     sendMessage({
-      content: `My goal is: "${goalTitle}"\nPillar: "${pillarTitle}"\n\nPlease suggest 8 actions for this pillar.`,
+      content: "Generate the 8 actions now.",
       data: {
         context: "action_crafting",
         goal: goalTitle,
