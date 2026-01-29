@@ -1,0 +1,1 @@
+export { MandalaGrid } from "./MandalaGrid";
