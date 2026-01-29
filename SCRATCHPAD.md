@@ -66,8 +66,10 @@ _Use this section for decisions, blockers, or context to preserve between sessio
 _Items to revisit when core flow is complete._
 
 - [x] Auto-populate pillars sidebar from AI response (fixed: AI SDK v6 uses response.messages array)
-- [ ] Build actions step (64 daily habits across 8 pillars)
+- [x] Build actions step (64 daily habits across 8 pillars)
+- [x] Dashboard with mandala grid visualization
 - [ ] Remove debug logging from chat API route before production
+- [ ] Check-in flow with action mapping
 
 ---
 
@@ -87,8 +89,18 @@ _Items to revisit when core flow is complete._
 - Fixed Clerk + Convex auth (added auth.config.ts + JWT template in Clerk dashboard)
 - Fixed goal context passing to pillars chat (include goal in message content)
 
+### Session: Jan 28, 2026
+- Fixed pillar navigation in ActionsStep — clicking back to completed pillars now loads saved actions
+- Added skills reference table to CLAUDE.md (ai-sdk-core, ai-sdk-ui, vercel-react-best-practices, prompt-engineering-patterns, web-design-guidelines)
+- **Built dashboard with mandala grid visualization:**
+  - Created `MandalaGrid` component with 9x9 grid layout
+  - Goal in center, pillars in inner ring, actions in outer 3x3 regions
+  - Heat map coloring (cold → warming → warm → hot → fire)
+  - Hover tooltips and click handlers ready for detail modals
+  - Stats sidebar with pillar list and activity placeholder
+- Simplified action crafting user message (redundant context removed)
+
 ### Next Session Priorities
-1. **Polish pillars auto-fill** — Tune regex to match AI output format so sidebar populates automatically
-2. **Build actions step** — AI suggests 8 actions per pillar (64 total), similar batch UX to pillars
-3. **Dashboard page** — Show the mandala grid visualization with goal → pillars → actions
-4. **Check-in flow** — Natural language input mapped to actions
+1. **Check-in flow** — Natural language input mapped to actions
+2. **Activity tracking** — Record check-ins to `actionActivity` table for heat calculation
+3. **Deploy to Vercel** — Get a public URL for demo
