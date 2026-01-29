@@ -127,6 +127,17 @@ Copy `.env.example` to `.env.local`. Required:
 
 ## Rules
 
+### Skills Reference
+Use these skills when working on relevant areas of the codebase:
+
+| Skill | When to Use |
+|-------|-------------|
+| `/ai-sdk-core` | Backend AI: `streamText`, `generateText`, API routes, error handling |
+| `/ai-sdk-ui` | Frontend AI: `useChat`, `useCompletion`, `useObject` hooks, message handling |
+| `/vercel-react-best-practices` | React/Next.js performance, data fetching, bundle optimization |
+| `/prompt-engineering-patterns` | Designing or improving AI coaching prompts |
+| `/web-design-guidelines` | UI review, accessibility, UX audit |
+
 ### Vercel AI SDK
 **Always use the `/ai-sdk-core` and `/ai-sdk-ui` skills** when:
 - Creating or modifying AI chat functionality
