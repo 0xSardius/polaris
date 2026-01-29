@@ -2,29 +2,32 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Current Status
+## Current Status (Jan 28, 2026)
 
-See `SCRATCHPAD.md` for build progress and session notes.
+**Core flow is complete:** Goal → Pillars → Actions → Dashboard with mandala visualization.
 
-## Known Issues (Codebase Review - Jan 2026)
+### What's Working
+- `/craft` — Single-page wizard: Goal chat → Pillars (AI suggests 8, editable) → Actions (8 per pillar, AI suggests)
+- `/dashboard` — Mandala grid visualization with heat map styling, stats sidebar, pillar list
+- Auth via Clerk, data persisted to Convex
+- Resumable crafting (user can leave and return)
 
-### Missing Files (Week 2+)
-- `src/components/mandala/MiniMap.tsx` — Heat map visualization
-- `src/lib/opik/client.ts` — Observability integration
-- `docs/PRD.md` — Full product requirements document
-- Pillar crafting flow (pages + Convex functions)
-- Action crafting flow (pages + Convex functions)
+### Next Steps (Priority Order)
+1. **Check-in flow** (`/check-in`) — Natural language input → AI maps to actions → store in `checkIns` + `actionActivity`
+2. **Wire heat to activity** — Dashboard mandala currently shows all "cold"; needs to query `actionActivity` for real heat
+3. **Deploy to Vercel** — Get public URL for hackathon demo
 
-### Configuration Issues
-- **ESLint version mismatch:** `eslint-config-next` is v16.x but Next.js is v15.x — update to `^15.1.6`
-- **Missing `.env.example`:** Was deleted, needs recreation for onboarding
+### Known Issues
 
-### Logic Inconsistency
-- **Action mapping parser mismatch:** `ACTION_MAPPING_PROMPT` in `src/lib/ai/prompts.ts` expects JSON response format, but `parseActionMapping()` in `src/lib/utils.ts` looks for text markers (`---MAPPING---`). Need to standardize on one approach.
+**Must fix for check-in flow:**
+- `ACTION_MAPPING_PROMPT` returns JSON but `parseActionMapping()` looks for `---MAPPING---` markers — standardize on JSON
 
-### Low: Cleanup
-- **Autoprefixer:** Can be removed from devDependencies (Tailwind v4 handles this internally)
-- **Git line endings:** Add `.gitattributes` with `* text=auto eol=lf` for cross-platform consistency
+**Low priority:**
+- ESLint version mismatch (eslint-config-next v16 vs Next.js v15)
+- Missing `.env.example`
+- Debug `console.log` in `/api/chat/route.ts` — remove before production
+
+See `SCRATCHPAD.md` for detailed session notes.
 
 ## Project Overview
 
