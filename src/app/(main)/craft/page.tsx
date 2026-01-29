@@ -600,15 +600,39 @@ function ActionsStep({
     goalId ? { goalId } : "skip"
   );
 
+  const currentPillar = pillarsData?.[currentPillarIndex];
+
+  // Fetch saved actions for the current pillar
+  const savedActions = useQuery(
+    api.actions.getByPillar,
+    currentPillar ? { pillarId: currentPillar._id } : "skip"
+  );
+
   // Mutation to save actions
   const saveActions = useMutation(api.actions.createBatch);
 
-  const currentPillar = pillarsData?.[currentPillarIndex];
-
-  // Reset actions when switching pillars
+  // Load saved actions when switching pillars or when data loads
   useEffect(() => {
-    setActions(Array(8).fill(""));
-  }, [currentPillarIndex]);
+    if (savedActions && savedActions.length === 8) {
+      // Pillar has saved actions - load them
+      const sortedActions = [...savedActions].sort((a, b) => a.position - b.position);
+      setActions(sortedActions.map((a) => a.title));
+    } else if (savedActions && savedActions.length === 0) {
+      // No saved actions - reset to empty
+      setActions(Array(8).fill(""));
+    }
+    // While savedActions is undefined (loading), keep current state
+  }, [savedActions]);
+
+  // Mark current pillar as completed if it has 8 saved actions
+  useEffect(() => {
+    if (savedActions && savedActions.length === 8) {
+      setCompletedPillars((prev) => {
+        if (prev.has(currentPillarIndex)) return prev;
+        return new Set([...prev, currentPillarIndex]);
+      });
+    }
+  }, [savedActions, currentPillarIndex]);
 
   const handleConfirmActions = async () => {
     if (!goalId || !currentPillar) return;
@@ -631,7 +655,7 @@ function ActionsStep({
       // Move to next pillar or finish
       if (currentPillarIndex < 7) {
         setCurrentPillarIndex(currentPillarIndex + 1);
-        setActions(Array(8).fill(""));
+        // Actions will be reset/loaded by the savedActions useEffect
       }
     } catch (error) {
       console.error("Failed to save actions:", error);
@@ -678,10 +702,7 @@ function ActionsStep({
         {pillarsData.map((pillar, index) => (
           <button
             key={pillar._id}
-            onClick={() => {
-              setCurrentPillarIndex(index);
-              setActions(Array(8).fill(""));
-            }}
+            onClick={() => setCurrentPillarIndex(index)}
             className={`flex-1 p-2 rounded-lg text-xs font-medium transition-colors ${
               completedPillars.has(index)
                 ? "bg-green-500/20 text-green-500 border border-green-500/30"
@@ -707,6 +728,7 @@ function ActionsStep({
           actions={actions}
           setActions={setActions}
           onConfirm={handleConfirmActions}
+          hasSavedActions={savedActions !== undefined && savedActions.length === 8}
         />
       )}
     </div>
@@ -724,6 +746,7 @@ function ActionEditor({
   actions,
   setActions,
   onConfirm,
+  hasSavedActions,
 }: {
   goalTitle: string;
   pillarTitle: string;
@@ -731,6 +754,7 @@ function ActionEditor({
   actions: string[];
   setActions: (a: string[]) => void;
   onConfirm: () => void;
+  hasSavedActions: boolean;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
@@ -807,6 +831,11 @@ function ActionEditor({
 
   // Trigger initial action suggestion (guards against React Strict Mode double-invocation)
   useEffect(() => {
+    // Skip AI trigger if this pillar already has saved actions
+    if (hasSavedActions) {
+      return;
+    }
+
     // Only trigger if we haven't already triggered for this specific pillar
     if (!pillarTitle || triggeredForPillarRef.current === pillarIndex) {
       return;
@@ -826,7 +855,7 @@ function ActionEditor({
         pillar: pillarTitle,
       },
     });
-  }, [pillarIndex, pillarTitle, goalTitle, sendMessage, setMessages]);
+  }, [pillarIndex, pillarTitle, goalTitle, sendMessage, setMessages, hasSavedActions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
