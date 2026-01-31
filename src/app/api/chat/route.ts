@@ -35,8 +35,6 @@ export async function POST(req: Request) {
     body.conversationHistory ||
     body.options?.body?.conversationHistory;
 
-  // Debug logging (remove in production)
-  console.log("[Chat API] Context:", context, "| Goal:", goal ? goal.substring(0, 30) + "..." : "none", "| Pillar:", pillar || "none");
 
   // Convert v6 UI messages (with parts) to model messages (with content string)
   const messages = rawMessages.map((msg: {

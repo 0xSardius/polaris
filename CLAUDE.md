@@ -22,8 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Low priority:**
 - ESLint version mismatch (eslint-config-next v16 vs Next.js v15)
-- Missing `.env.example`
-- Debug `console.log` in `/api/chat/route.ts` and `/dashboard/page.tsx` — remove before production
+- Unused `framer-motion` dependency (can remove to reduce bundle size)
 
 See `SCRATCHPAD.md` for detailed session notes.
 

@@ -138,8 +138,7 @@ export default function DashboardPage() {
             pillars={pillars}
             actions={actions}
             activity={activityData}
-            onCellClick={(type, id) => {
-              console.log("Clicked:", type, id);
+            onCellClick={() => {
               // TODO: Show detail modal
             }}
           />

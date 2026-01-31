@@ -4,13 +4,12 @@ import { UserButton } from "@clerk/nextjs";
 import { UserSync } from "@/components/providers/user-sync";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Target, MessageSquare, BarChart3 } from "lucide-react";
+import { Home, Target, MessageSquare } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "My Goal", href: "/craft", icon: Target },
   { name: "Check In", href: "/check-in", icon: MessageSquare },
-  { name: "Progress", href: "/progress", icon: BarChart3 },
 ];
 
 export default function MainLayout({
