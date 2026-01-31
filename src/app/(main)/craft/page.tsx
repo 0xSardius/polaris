@@ -220,9 +220,7 @@ function GoalStep({
   const [input, setInput] = useState("");
   const [hasEngaged, setHasEngaged] = useState(false);
 
-  const { messages, sendMessage, status } = useChat({
-    api: "/api/chat",
-  });
+  const { messages, sendMessage, status } = useChat();
 
   const isLoading =
     status === "streaming" ||
@@ -367,7 +365,6 @@ function PillarsStep({
   const hasAutoFilled = useRef(false);
 
   const { messages, sendMessage, status } = useChat({
-    api: "/api/chat",
     onFinish: (response) => {
       // Only auto-fill once (on first AI response)
       if (hasAutoFilled.current) return;
@@ -761,7 +758,6 @@ function ActionEditor({
   const autoFilledForPillarRef = useRef<number | null>(null);
 
   const { messages, sendMessage, status, setMessages } = useChat({
-    api: "/api/chat",
     id: `actions-${pillarIndex}`, // Unique chat per pillar
     onFinish: (response) => {
       // Only auto-fill once per pillar

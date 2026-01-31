@@ -28,7 +28,6 @@ export function ChatInterface({
   const [input, setInput] = useState("");
 
   const { messages, sendMessage, status } = useChat({
-    api: "/api/chat",
     onFinish: (message) => {
       // Get content from message - handle both string and parts formats
       const content =
