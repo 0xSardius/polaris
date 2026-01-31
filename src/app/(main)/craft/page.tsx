@@ -220,7 +220,9 @@ function GoalStep({
   const [input, setInput] = useState("");
   const [hasEngaged, setHasEngaged] = useState(false);
 
-  const { messages, sendMessage, status } = useChat();
+  const { messages, append, status } = useChat({
+    body: { context: "goal_crafting" },
+  });
 
   const isLoading = status !== "ready";
 
@@ -233,10 +235,7 @@ function GoalStep({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
-      sendMessage({
-        content: input,
-        data: { context: "goal_crafting" },
-      });
+      append({ role: "user", content: input });
       setInput("");
       setHasEngaged(true);
     }
@@ -361,7 +360,8 @@ function PillarsStep({
   const hasTriggeredInitial = useRef(false);
   const hasAutoFilled = useRef(false);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, append, status } = useChat({
+    body: { context: "pillar_crafting", goal: goalTitle },
     onFinish: (response) => {
       // Only auto-fill once (on first AI response)
       if (hasAutoFilled.current) return;
@@ -435,26 +435,17 @@ function PillarsStep({
     if (goalTitle && !hasTriggeredInitial.current && messages.length === 0) {
       hasTriggeredInitial.current = true;
       // Include goal in message content as fallback (data passing can be unreliable)
-      sendMessage({
+      append({
+        role: "user",
         content: `My goal is: "${goalTitle}"\n\nPlease suggest 8 pillars to support this goal.`,
-        data: {
-          context: "pillar_crafting",
-          goal: goalTitle,
-        },
       });
     }
-  }, [goalTitle, messages.length, sendMessage]);
+  }, [goalTitle, messages.length, append]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
-      sendMessage({
-        content: input,
-        data: {
-          context: "pillar_crafting",
-          goal: goalTitle,
-        },
-      });
+      append({ role: "user", content: input });
       setInput("");
     }
   };
@@ -751,8 +742,9 @@ function ActionEditor({
   const triggeredForPillarRef = useRef<number | null>(null);
   const autoFilledForPillarRef = useRef<number | null>(null);
 
-  const { messages, sendMessage, status, setMessages } = useChat({
+  const { messages, append, status, setMessages } = useChat({
     id: `actions-${pillarIndex}`, // Unique chat per pillar
+    body: { context: "action_crafting", goal: goalTitle, pillar: pillarTitle },
     onFinish: (response) => {
       // Only auto-fill once per pillar
       if (autoFilledForPillarRef.current === pillarIndex) return;
@@ -831,27 +823,13 @@ function ActionEditor({
     // Clear previous messages and send new request
     // Keep user message minimal - system prompt has all context
     setMessages([]);
-    sendMessage({
-      content: "Generate the 8 actions now.",
-      data: {
-        context: "action_crafting",
-        goal: goalTitle,
-        pillar: pillarTitle,
-      },
-    });
-  }, [pillarIndex, pillarTitle, goalTitle, sendMessage, setMessages, hasSavedActions]);
+    append({ role: "user", content: "Generate the 8 actions now." });
+  }, [pillarIndex, pillarTitle, goalTitle, append, setMessages, hasSavedActions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
-      sendMessage({
-        content: input,
-        data: {
-          context: "action_crafting",
-          goal: goalTitle,
-          pillar: pillarTitle,
-        },
-      });
+      append({ role: "user", content: input });
       setInput("");
     }
   };

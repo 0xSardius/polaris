@@ -27,7 +27,8 @@ export function ChatInterface({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, append, status } = useChat({
+    body: { context, goalId, pillarId },
     onFinish: (message) => {
       // Get content from message - handle both string and parts formats
       const content =
@@ -86,10 +87,7 @@ export function ChatInterface({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
-      sendMessage({
-        content: input,
-        data: { context, goalId, pillarId },
-      });
+      append({ role: "user", content: input });
       setInput("");
     }
   };
