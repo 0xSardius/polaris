@@ -100,7 +100,20 @@ _Items to revisit when core flow is complete._
   - Stats sidebar with pillar list and activity placeholder
 - Simplified action crafting user message (redundant context removed)
 
+### Session: Jan 30, 2026
+- **Check-in flow is complete:**
+  - `/check-in` page with natural language input
+  - AI maps input to actions via `ACTION_MAPPING_PROMPT` (returns JSON)
+  - `parseActionMapping()` parses JSON correctly (the CLAUDE.md issue was outdated)
+  - User confirms mapping → stored in `checkIns` + `actionActivity` tables
+  - Recent check-ins displayed on check-in page
+- **Dashboard wired to real heat data:**
+  - Added `heatData` query from `actionActivity.getHeatData`
+  - Transformed to `ActivityData[]` format for `MandalaGrid`
+  - Mandala now shows real heat levels based on activity
+  - Recent Activity section shows actual check-ins
+- Updated CLAUDE.md to reflect current status
+
 ### Next Session Priorities
-1. **Check-in flow** — Natural language input mapped to actions
-2. **Activity tracking** — Record check-ins to `actionActivity` table for heat calculation
-3. **Deploy to Vercel** — Get a public URL for demo
+1. **Deploy to Vercel** — Get a public URL for demo
+2. **Polish** — Remove debug console.logs, final testing

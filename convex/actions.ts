@@ -85,3 +85,35 @@ export const markAllPillarsComplete = mutation({
     });
   },
 });
+
+// Get all actions with pillar info for check-in mapping
+export const getWithPillarInfo = query({
+  args: { goalId: v.id("goals") },
+  handler: async (ctx, args) => {
+    const actions = await ctx.db
+      .query("actions")
+      .withIndex("by_goal", (q) => q.eq("goalId", args.goalId))
+      .collect();
+
+    // Get pillar titles for each action
+    const actionsWithPillars = await Promise.all(
+      actions.map(async (action) => {
+        const pillar = await ctx.db.get(action.pillarId);
+        return {
+          id: action._id,
+          title: action.title,
+          pillar: pillar?.title || "Unknown",
+          pillarPosition: pillar?.position || 0,
+          position: action.position,
+        };
+      })
+    );
+
+    return actionsWithPillars.sort((a, b) => {
+      if (a.pillarPosition !== b.pillarPosition) {
+        return a.pillarPosition - b.pillarPosition;
+      }
+      return a.position - b.position;
+    });
+  },
+});

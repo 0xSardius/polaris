@@ -2,30 +2,28 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Current Status (Jan 28, 2026)
+## Current Status (Jan 30, 2026)
 
-**Core flow is complete:** Goal → Pillars → Actions → Dashboard with mandala visualization.
+**Full demo loop complete:** Goal → Pillars → Actions → Dashboard → Check-in → Heat updates
 
 ### What's Working
 - `/craft` — Single-page wizard: Goal chat → Pillars (AI suggests 8, editable) → Actions (8 per pillar, AI suggests)
-- `/dashboard` — Mandala grid visualization with heat map styling, stats sidebar, pillar list
+- `/dashboard` — Mandala grid visualization with real heat data, stats sidebar, recent check-ins
+- `/check-in` — Natural language input → AI maps to actions → stores in `checkIns` + `actionActivity`
 - Auth via Clerk, data persisted to Convex
 - Resumable crafting (user can leave and return)
+- Heat system working: activity updates flow through to mandala colors
 
 ### Next Steps (Priority Order)
-1. **Check-in flow** (`/check-in`) — Natural language input → AI maps to actions → store in `checkIns` + `actionActivity`
-2. **Wire heat to activity** — Dashboard mandala currently shows all "cold"; needs to query `actionActivity` for real heat
-3. **Deploy to Vercel** — Get public URL for hackathon demo
+1. **Deploy to Vercel** — Get public URL for hackathon demo
+2. **Polish** — Remove debug console.logs, add loading states where needed
 
 ### Known Issues
-
-**Must fix for check-in flow:**
-- `ACTION_MAPPING_PROMPT` returns JSON but `parseActionMapping()` looks for `---MAPPING---` markers — standardize on JSON
 
 **Low priority:**
 - ESLint version mismatch (eslint-config-next v16 vs Next.js v15)
 - Missing `.env.example`
-- Debug `console.log` in `/api/chat/route.ts` — remove before production
+- Debug `console.log` in `/api/chat/route.ts` and `/dashboard/page.tsx` — remove before production
 
 See `SCRATCHPAD.md` for detailed session notes.
 
@@ -79,7 +77,7 @@ Prompts use structured markers for parsing:
 - `---GOAL_CONFIRMED---` with `goal:` field
 - `---PILLAR_CONFIRMED---` with `pillar:` and `position:` fields
 - `---ACTION_CONFIRMED---` with `action:` and `position:` fields
-- `---MAPPING---` with `actions:` and `confidence:` fields
+- `ACTION_MAPPING_PROMPT` returns JSON with `mappedActionIds`, `confidence`, `reasoning`
 
 ### Heat System
 Heat levels: `cold` → `warming` → `warm` → `hot` → `fire`

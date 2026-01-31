@@ -2,8 +2,9 @@
 
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
 import Link from "next/link";
-import { Target, Sparkles, MessageCircle, TrendingUp, Calendar } from "lucide-react";
+import { Target, Sparkles, MessageCircle, TrendingUp, Calendar, Check } from "lucide-react";
 import { MandalaGrid } from "@/components/mandala/MandalaGrid";
 import { formatRelativeTime } from "@/lib/utils";
 
@@ -18,6 +19,16 @@ export default function DashboardPage() {
   );
   const actions = useQuery(
     api.actions.getByGoal,
+    activeGoal ? { goalId: activeGoal._id } : "skip"
+  );
+
+  // Fetch heat data and recent check-ins
+  const heatData = useQuery(
+    api.actionActivity.getHeatData,
+    activeGoal ? { goalId: activeGoal._id } : "skip"
+  );
+  const recentCheckIns = useQuery(
+    api.checkIns.getRecentByGoal,
     activeGoal ? { goalId: activeGoal._id } : "skip"
   );
 
@@ -85,6 +96,15 @@ export default function DashboardPage() {
   const totalActions = actions.length;
   const activatedDate = activeGoal.updatedAt;
 
+  // Transform heat data for MandalaGrid
+  const activityData = heatData
+    ? Object.entries(heatData).map(([actionId, data]) => ({
+        actionId: actionId as Id<"actions">,
+        lastActivity: data.lastActivity || undefined,
+        streak: data.streak,
+      }))
+    : [];
+
   return (
     <div className="max-w-6xl">
       {/* Header */}
@@ -117,6 +137,7 @@ export default function DashboardPage() {
             goalTitle={activeGoal.title}
             pillars={pillars}
             actions={actions}
+            activity={activityData}
             onCellClick={(type, id) => {
               console.log("Clicked:", type, id);
               // TODO: Show detail modal
@@ -184,18 +205,50 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Recent Activity Placeholder */}
+          {/* Recent Activity */}
           <div className="bg-card rounded-xl p-4 border border-border">
             <h3 className="text-sm font-semibold text-muted-foreground mb-3">Recent Activity</h3>
-            <p className="text-sm text-muted-foreground text-center py-4">
-              No check-ins yet. Start tracking your progress!
-            </p>
-            <Link
-              href="/check-in"
-              className="block text-center text-sm text-primary hover:underline"
-            >
-              Record your first check-in →
-            </Link>
+            {recentCheckIns && recentCheckIns.length > 0 ? (
+              <div className="space-y-2">
+                {recentCheckIns.slice(0, 5).map((checkIn) => (
+                  <div
+                    key={checkIn._id}
+                    className="p-2 rounded-lg bg-secondary/30 text-sm"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-xs truncate flex-1">{checkIn.rawInput}</p>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {formatRelativeTime(checkIn.createdAt)}
+                      </span>
+                    </div>
+                    {checkIn.mappedActionIds.length > 0 && (
+                      <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                        <Check className="w-3 h-3" />
+                        {checkIn.mappedActionIds.length} action{checkIn.mappedActionIds.length > 1 ? "s" : ""}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <Link
+                  href="/check-in"
+                  className="block text-center text-sm text-primary hover:underline pt-2"
+                >
+                  View all check-ins →
+                </Link>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No check-ins yet. Start tracking your progress!
+                </p>
+                <Link
+                  href="/check-in"
+                  className="block text-center text-sm text-primary hover:underline"
+                >
+                  Record your first check-in →
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

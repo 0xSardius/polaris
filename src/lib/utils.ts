@@ -141,16 +141,36 @@ export function parseActionConfirmation(response: string): { action: string; pos
   return null;
 }
 
-export function parseActionMapping(response: string): { actions: string[]; confidence: number } | null {
-  const match = response.match(/---MAPPING---\s*actions:\s*(.+)\s*confidence:\s*([\d.]+)/i);
+export function parseActionMapping(response: string): {
+  mappedActionIds: string[];
+  confidence: number;
+  reasoning: string;
+} | null {
+  // ACTION_MAPPING_PROMPT returns JSON format
+  try {
+    // Try to extract JSON from the response (may have markdown code blocks)
+    const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)```/) ||
+                      response.match(/(\{[\s\S]*\})/);
 
-  if (match) {
-    const actionsStr = match[1].trim();
-    const actions = actionsStr === "none" ? [] : actionsStr.split(",").map(s => s.trim());
-    const confidence = parseFloat(match[2]);
-    return { actions, confidence };
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[1].trim());
+      return {
+        mappedActionIds: parsed.mappedActionIds || [],
+        confidence: parsed.confidence || 0,
+        reasoning: parsed.reasoning || "",
+      };
+    }
+
+    // Try parsing the whole response as JSON
+    const parsed = JSON.parse(response.trim());
+    return {
+      mappedActionIds: parsed.mappedActionIds || [],
+      confidence: parsed.confidence || 0,
+      reasoning: parsed.reasoning || "",
+    };
+  } catch {
+    return null;
   }
-  return null;
 }
 
 export function parsePillarsConfirmation(response: string): string[] | null {
