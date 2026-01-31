@@ -220,15 +220,14 @@ function GoalStep({
   const [input, setInput] = useState("");
   const [hasEngaged, setHasEngaged] = useState(false);
 
-  const { messages, sendMessage, status, isLoading: hookIsLoading } = useChat({
+  const { messages, sendMessage, status } = useChat({
     api: "/api/chat",
   });
 
   const isLoading =
-    hookIsLoading ??
-    (status === "streaming" ||
-      status === "submitted" ||
-      status === "in_progress");
+    status === "streaming" ||
+    status === "submitted" ||
+    status === "in_progress";
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -367,7 +366,7 @@ function PillarsStep({
   const hasTriggeredInitial = useRef(false);
   const hasAutoFilled = useRef(false);
 
-  const { messages, sendMessage, status, isLoading: hookIsLoading } = useChat({
+  const { messages, sendMessage, status } = useChat({
     api: "/api/chat",
     onFinish: (response) => {
       // Only auto-fill once (on first AI response)
@@ -429,10 +428,9 @@ function PillarsStep({
   });
 
   const isLoading =
-    hookIsLoading ??
-    (status === "streaming" ||
-      status === "submitted" ||
-      status === "in_progress");
+    status === "streaming" ||
+    status === "submitted" ||
+    status === "in_progress";
 
   // Auto-scroll
   useEffect(() => {
@@ -762,7 +760,7 @@ function ActionEditor({
   const triggeredForPillarRef = useRef<number | null>(null);
   const autoFilledForPillarRef = useRef<number | null>(null);
 
-  const { messages, sendMessage, status, isLoading: hookIsLoading, setMessages } = useChat({
+  const { messages, sendMessage, status, setMessages } = useChat({
     api: "/api/chat",
     id: `actions-${pillarIndex}`, // Unique chat per pillar
     onFinish: (response) => {
@@ -817,10 +815,9 @@ function ActionEditor({
   });
 
   const isLoading =
-    hookIsLoading ??
-    (status === "streaming" ||
-      status === "submitted" ||
-      status === "in_progress");
+    status === "streaming" ||
+    status === "submitted" ||
+    status === "in_progress";
 
   // Auto-scroll
   useEffect(() => {
