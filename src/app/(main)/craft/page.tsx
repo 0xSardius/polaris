@@ -222,10 +222,7 @@ function GoalStep({
 
   const { messages, sendMessage, status } = useChat();
 
-  const isLoading =
-    status === "streaming" ||
-    status === "submitted" ||
-    status === "in_progress";
+  const isLoading = status !== "ready";
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -424,10 +421,7 @@ function PillarsStep({
     },
   });
 
-  const isLoading =
-    status === "streaming" ||
-    status === "submitted" ||
-    status === "in_progress";
+  const isLoading = status !== "ready";
 
   // Auto-scroll
   useEffect(() => {
@@ -810,10 +804,7 @@ function ActionEditor({
     },
   });
 
-  const isLoading =
-    status === "streaming" ||
-    status === "submitted" ||
-    status === "in_progress";
+  const isLoading = status !== "ready";
 
   // Auto-scroll
   useEffect(() => {

@@ -74,7 +74,7 @@ export function ChatInterface({
     },
   });
 
-  const isLoading = status === "streaming" || status === "submitted" || status === "in_progress";
+  const isLoading = status !== "ready";
 
   // Auto-scroll to bottom
   useEffect(() => {
