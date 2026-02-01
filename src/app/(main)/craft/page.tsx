@@ -372,16 +372,12 @@ function PillarsStep({
         );
 
         if (lastAssistant) {
-          // v6 format: check parts array first
+          // v6 format: extract text from parts array
           if (lastAssistant.parts && Array.isArray(lastAssistant.parts)) {
             content = lastAssistant.parts
-              .filter((p: { type: string; text?: string }) => p.type === "text" && p.text)
-              .map((p: { text: string }) => p.text)
+              .filter((p): p is { type: "text"; text: string } => p.type === "text" && "text" in p)
+              .map((p) => p.text)
               .join("");
-          }
-          // Fallback to content string
-          else if (typeof lastAssistant.content === "string") {
-            content = lastAssistant.content;
           }
         }
       }
@@ -753,13 +749,12 @@ function ActionEditor({
         );
 
         if (lastAssistant) {
+          // v6 format: extract text from parts array
           if (lastAssistant.parts && Array.isArray(lastAssistant.parts)) {
             content = lastAssistant.parts
-              .filter((p: { type: string; text?: string }) => p.type === "text" && p.text)
-              .map((p: { text: string }) => p.text)
+              .filter((p): p is { type: "text"; text: string } => p.type === "text" && "text" in p)
+              .map((p) => p.text)
               .join("");
-          } else if (typeof lastAssistant.content === "string") {
-            content = lastAssistant.content;
           }
         }
       }
