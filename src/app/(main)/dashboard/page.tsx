@@ -1,14 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import Link from "next/link";
 import { Target, Sparkles, MessageCircle, TrendingUp, Calendar, Check } from "lucide-react";
 import { MandalaGrid } from "@/components/mandala/MandalaGrid";
+import { MandalaDetailModal } from "@/components/mandala/MandalaDetailModal";
 import { formatRelativeTime } from "@/lib/utils";
 
 export default function DashboardPage() {
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    type: "goal" | "pillar" | "action";
+    selectedId?: string;
+  }>({ isOpen: false, type: "goal" });
+
   const user = useQuery(api.users.getCurrent);
   const activeGoal = useQuery(api.goals.getActiveGoal);
 
@@ -138,8 +146,8 @@ export default function DashboardPage() {
             pillars={pillars}
             actions={actions}
             activity={activityData}
-            onCellClick={() => {
-              // TODO: Show detail modal
+            onCellClick={(type, id) => {
+              setModalState({ isOpen: true, type, selectedId: id });
             }}
           />
         </div>
@@ -251,6 +259,18 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Detail Modal */}
+      <MandalaDetailModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState({ ...modalState, isOpen: false })}
+        type={modalState.type}
+        goalTitle={activeGoal.title}
+        pillars={pillars}
+        actions={actions}
+        activity={activityData}
+        selectedId={modalState.selectedId}
+      />
     </div>
   );
 }
