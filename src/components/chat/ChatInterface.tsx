@@ -91,7 +91,7 @@ export function ChatInterface({
       if (context === "action_crafting" && goalId && pillarId) {
         messageContent = `[GOAL:${goalId}][PILLAR:${pillarId}]\n\n${input}`;
       }
-      sendMessage({ content: messageContent });
+      sendMessage({ text: messageContent });
       setInput("");
     }
   };

@@ -233,7 +233,7 @@ function GoalStep({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
-      sendMessage({ content: input });
+      sendMessage({ text: input });
       setInput("");
       setHasEngaged(true);
     }
@@ -433,7 +433,7 @@ function PillarsStep({
       hasTriggeredInitial.current = true;
       // Include goal in message content as fallback (data passing can be unreliable)
       sendMessage({
-        content: `My goal is: "${goalTitle}"\n\nPlease suggest 8 pillars to support this goal.`,
+        text: `My goal is: "${goalTitle}"\n\nPlease suggest 8 pillars to support this goal.`,
       });
     }
   }, [goalTitle, messages.length, sendMessage]);
@@ -441,7 +441,7 @@ function PillarsStep({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
-      sendMessage({ content: input });
+      sendMessage({ text: input });
       setInput("");
     }
   };
@@ -818,13 +818,13 @@ function ActionEditor({
     // Clear previous messages and send new request
     // Include context markers for API route to parse context
     setMessages([]);
-    sendMessage({ content: `[GOAL:${goalTitle}][PILLAR:${pillarTitle}]\n\nGenerate the 8 actions now.` });
+    sendMessage({ text: `[GOAL:${goalTitle}][PILLAR:${pillarTitle}]\n\nGenerate the 8 actions now.` });
   }, [pillarIndex, pillarTitle, goalTitle, sendMessage, setMessages, hasSavedActions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
-      sendMessage({ content: input });
+      sendMessage({ text: input });
       setInput("");
     }
   };
