@@ -28,7 +28,6 @@ export function ChatInterface({
   const [input, setInput] = useState("");
 
   const { messages, sendMessage, status } = useChat({
-    body: { context, goalId, pillarId },
     onFinish: (message) => {
       // Get content from message - handle both string and parts formats
       const content =
@@ -87,7 +86,12 @@ export function ChatInterface({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
-      sendMessage({ content: input });
+      // Include context markers for API route to parse context
+      let messageContent = input;
+      if (context === "action_crafting" && goalId && pillarId) {
+        messageContent = `[GOAL:${goalId}][PILLAR:${pillarId}]\n\n${input}`;
+      }
+      sendMessage({ content: messageContent });
       setInput("");
     }
   };

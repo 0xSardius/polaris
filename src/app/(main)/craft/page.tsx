@@ -220,9 +220,7 @@ function GoalStep({
   const [input, setInput] = useState("");
   const [hasEngaged, setHasEngaged] = useState(false);
 
-  const { messages, sendMessage, status } = useChat({
-    body: { context: "goal_crafting" },
-  });
+  const { messages, sendMessage, status } = useChat();
 
   const isLoading = status !== "ready";
 
@@ -361,7 +359,6 @@ function PillarsStep({
   const hasAutoFilled = useRef(false);
 
   const { messages, sendMessage, status } = useChat({
-    body: { context: "pillar_crafting", goal: goalTitle },
     onFinish: (response) => {
       // Only auto-fill once (on first AI response)
       if (hasAutoFilled.current) return;
@@ -743,7 +740,6 @@ function ActionEditor({
 
   const { messages, sendMessage, status, setMessages } = useChat({
     id: `actions-${pillarIndex}`, // Unique chat per pillar
-    body: { context: "action_crafting", goal: goalTitle, pillar: pillarTitle },
     onFinish: (response) => {
       // Only auto-fill once per pillar
       if (autoFilledForPillarRef.current === pillarIndex) return;
@@ -820,9 +816,9 @@ function ActionEditor({
     triggeredForPillarRef.current = pillarIndex;
 
     // Clear previous messages and send new request
-    // Keep user message minimal - system prompt has all context
+    // Include context markers for API route to parse context
     setMessages([]);
-    sendMessage({ content: "Generate the 8 actions now." });
+    sendMessage({ content: `[GOAL:${goalTitle}][PILLAR:${pillarTitle}]\n\nGenerate the 8 actions now.` });
   }, [pillarIndex, pillarTitle, goalTitle, sendMessage, setMessages, hasSavedActions]);
 
   const handleSubmit = (e: React.FormEvent) => {
