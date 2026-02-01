@@ -145,7 +145,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Sidebar */}
-        <div className="space-y-4">
+        <div className="space-y-4 relative z-10">
           {/* Quick Stats */}
           <div className="bg-card rounded-xl p-4 border border-border">
             <h3 className="text-sm font-semibold text-muted-foreground mb-3">Progress</h3>

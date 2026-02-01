@@ -98,6 +98,9 @@ body {
   padding: 0.5rem;
   background-color: color-mix(in srgb, #0f172a 50%, transparent);
   border-radius: 0.75rem;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
 }
 
 .mandala-cell {
@@ -112,6 +115,7 @@ body {
   line-height: 1.25;
   cursor: pointer;
   transition: all 0.2s;
+  overflow: hidden;
 }
 
 .mandala-cell:hover {
