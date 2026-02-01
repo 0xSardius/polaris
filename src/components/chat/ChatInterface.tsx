@@ -28,10 +28,10 @@ export function ChatInterface({
   const [input, setInput] = useState("");
 
   const { messages, sendMessage, status } = useChat({
-    onFinish: (message) => {
-      // AI SDK v6 uses parts array, not content string
+    onFinish: (response) => {
+      // AI SDK v6: onFinish receives { message, messages, ... }
       const content =
-        message.parts
+        response.message.parts
           ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
           .map((p) => p.text)
           .join("") || "";
