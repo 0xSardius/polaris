@@ -240,7 +240,7 @@ function GoalStep({
   };
 
   const getMessageContent = (message: (typeof messages)[0]): string => {
-    if (typeof message.content === "string") return message.content;
+    // AI SDK v6 uses parts array, not content string
     return (
       message.parts
         ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
@@ -453,7 +453,7 @@ function PillarsStep({
   };
 
   const getMessageContent = (message: (typeof messages)[0]): string => {
-    if (typeof message.content === "string") return message.content;
+    // AI SDK v6 uses parts array, not content string
     return (
       message.parts
         ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
@@ -836,7 +836,7 @@ function ActionEditor({
   };
 
   const getMessageContent = (message: (typeof messages)[0]): string => {
-    if (typeof message.content === "string") return message.content;
+    // AI SDK v6 uses parts array, not content string
     return (
       message.parts
         ?.filter((p): p is { type: "text"; text: string } => p.type === "text")

@@ -29,14 +29,12 @@ export function ChatInterface({
 
   const { messages, sendMessage, status } = useChat({
     onFinish: (message) => {
-      // Get content from message - handle both string and parts formats
+      // AI SDK v6 uses parts array, not content string
       const content =
-        typeof message.content === "string"
-          ? message.content
-          : message.parts
-              ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
-              .map((p) => p.text)
-              .join("") || "";
+        message.parts
+          ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+          .map((p) => p.text)
+          .join("") || "";
 
       // Check for confirmations in the response
       if (context === "goal_crafting" && onGoalConfirmed) {
@@ -96,12 +94,8 @@ export function ChatInterface({
     }
   };
 
-  // Helper to get message content
+  // Helper to get message content - AI SDK v6 uses parts array
   const getMessageContent = (message: (typeof messages)[0]): string => {
-    if (typeof message.content === "string") {
-      return message.content;
-    }
-    // v6 format with parts
     return (
       message.parts
         ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
