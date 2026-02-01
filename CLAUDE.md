@@ -2,9 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Current Status (Jan 30, 2026)
+## Current Status (Feb 1, 2026)
 
-**Full demo loop complete:** Goal → Pillars → Actions → Dashboard → Check-in → Heat updates
+**Deployed to Vercel!** Full demo loop working in production.
 
 ### What's Working
 - `/craft` — Single-page wizard: Goal chat → Pillars (AI suggests 8, editable) → Actions (8 per pillar, AI suggests)
@@ -13,16 +13,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Auth via Clerk, data persisted to Convex
 - Resumable crafting (user can leave and return)
 - Heat system working: activity updates flow through to mandala colors
+- **Production deployment on Vercel** with Convex backend
+
+### Recent Changes (Feb 1)
+Completed AI SDK v6 migration for Vercel deployment:
+- Removed `body` prop from `useChat` (not supported in v6)
+- Changed `sendMessage({ content })` → `sendMessage({ text })`
+- Updated message access to use `parts` array (no `content` property on UIMessage)
+- Fixed `onFinish` callback to use `response.message.parts`
+- Context now passed via message content markers (parsed in API route)
 
 ### Next Steps (Priority Order)
-1. **Deploy to Vercel** — Get public URL for hackathon demo
+1. **Test production deployment** — Verify all flows work end-to-end
 2. **Polish** — Remove debug console.logs, add loading states where needed
+3. **Demo prep** — Screenshots, demo script for hackathon presentation
 
 ### Known Issues
 
 **Low priority:**
 - ESLint version mismatch (eslint-config-next v16 vs Next.js v15)
 - Unused `framer-motion` dependency (can remove to reduce bundle size)
+- API route has a debug `console.log` — remove before final demo
 
 See `SCRATCHPAD.md` for detailed session notes.
 
@@ -87,21 +98,34 @@ Heat levels: `cold` → `warming` → `warm` → `hot` → `fire`
 
 ## Key Patterns
 
-### Chat with AI (v5/v6 pattern)
+### Chat with AI (AI SDK v6 pattern)
 ```tsx
 import { useChat } from "@ai-sdk/react";
 import { useState } from "react";
 
 const [input, setInput] = useState("");
 const { messages, sendMessage, status } = useChat({
-  api: "/api/chat",
+  onFinish: (response) => {
+    // Access message content via response.message.parts
+    const content = response.message.parts
+      ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+      .map((p) => p.text)
+      .join("") || "";
+  },
 });
 
-// Send message with data
-sendMessage({
-  content: input,
-  data: { context: "goal_crafting", goalId },
-});
+const isLoading = status !== "ready";
+
+// Send message (v6 uses 'text' not 'content')
+sendMessage({ text: input });
+
+// Get message content helper (v6 uses parts, not content)
+const getMessageContent = (message: typeof messages[0]): string => {
+  return message.parts
+    ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+    .map((p) => p.text)
+    .join("") || "";
+};
 ```
 
 ### Convex Queries/Mutations
