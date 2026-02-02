@@ -4,29 +4,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Status (Feb 1, 2026)
 
-**Deployed to Vercel!** Full demo loop working in production.
+**Deployed to Vercel!** Full demo loop tested and working in production.
 
 ### What's Working
 - `/craft` — Single-page wizard: Goal chat → Pillars (AI suggests 8, editable) → Actions (8 per pillar, AI suggests)
-- `/dashboard` — Mandala grid visualization with real heat data, stats sidebar, recent check-ins
+- `/dashboard` — Mandala grid with interactive detail modals, heat visualization, stats sidebar, recent check-ins
 - `/check-in` — Natural language input → AI maps to actions → stores in `checkIns` + `actionActivity`
+- **Interactive Mandala** — Click any cell to see details (goal overview, pillar with actions, action with heat/streak)
+- **Ohtani Method Explainer** — Collapsible "How It Works" section in sidebar
 - Auth via Clerk, data persisted to Convex
 - Resumable crafting (user can leave and return)
 - Heat system working: activity updates flow through to mandala colors
 - **Production deployment on Vercel** with Convex backend
 
 ### Recent Changes (Feb 1)
-Completed AI SDK v6 migration for Vercel deployment:
-- Removed `body` prop from `useChat` (not supported in v6)
-- Changed `sendMessage({ content })` → `sendMessage({ text })`
-- Updated message access to use `parts` array (no `content` property on UIMessage)
-- Fixed `onFinish` callback to use `response.message.parts`
-- Context now passed via message content markers (parsed in API route)
+- AI SDK v6 migration for Vercel deployment
+- Added `MandalaDetailModal` — click cells to view full details
+- Added "The Ohtani Method" explainer in sidebar
+- Fixed mandala overlay/z-index issues
+- Fixed Convex auth (`CLERK_JWT_ISSUER_DOMAIN` without `https://` prefix)
+- Created `docs/ARCHITECTURE.md` with system overview
 
-### Next Steps (Priority Order)
-1. **Test production deployment** — Verify all flows work end-to-end
-2. **Polish** — Remove debug console.logs, add loading states where needed
-3. **Demo prep** — Screenshots, demo script for hackathon presentation
+### Next Steps
+1. **Demo prep** — Screenshots, demo script for hackathon presentation
+2. **Polish (optional)** — Remove debug console.logs
 
 ### Known Issues
 
@@ -35,7 +36,7 @@ Completed AI SDK v6 migration for Vercel deployment:
 - Unused `framer-motion` dependency (can remove to reduce bundle size)
 - API route has a debug `console.log` — remove before final demo
 
-See `SCRATCHPAD.md` for detailed session notes.
+See `docs/ARCHITECTURE.md` for system overview and `SCRATCHPAD.md` for session notes.
 
 ## Project Overview
 
