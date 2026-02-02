@@ -2,6 +2,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import { ACTION_MAPPING_PROMPT } from "@/lib/ai/prompts";
 import { parseActionMapping } from "@/lib/utils";
+import { traceCheckInMapping } from "@/lib/opik/tracing";
 
 export const maxDuration = 30;
 
@@ -34,6 +35,14 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+
+  // Trace successful mapping (fire-and-forget, never blocks or crashes)
+  traceCheckInMapping({
+    userInput,
+    actionCount: actions.length,
+    mappedCount: parsed.mappedActionIds.length,
+    confidence: parsed.confidence,
+  });
 
   return Response.json({
     mappedActionIds: parsed.mappedActionIds,
