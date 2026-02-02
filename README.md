@@ -4,6 +4,8 @@
 
 Transform one ambitious goal into 64 daily actions using the Ohtani/Harada Method. Track progress with an AI coach that adapts.
 
+**[Live Demo](https://polaris-rho-hazel.vercel.app)** | [GitHub](https://github.com/0xSardius/polaris)
+
 ## 🎯 What is Polaris?
 
 Polaris is an AI-powered goal coaching app built for the [Encode Club "Commit To Change" Hackathon](https://www.encodeclub.com/programmes/comet-resolution-v2-hackathon).
@@ -20,14 +22,20 @@ Polaris is an AI-powered goal coaching app built for the [Encode Club "Commit To
 - **Adaptive Coaching** — AI notices patterns, celebrates streaks, nudges cold pillars
 - **Opik Observability** — Full tracing of coaching effectiveness for continuous improvement
 
+## 📸 Screenshots
+
+| Goal Crafting | Mandala Dashboard | Check-in |
+|:---:|:---:|:---:|
+| AI guides you through defining your goal | Visual heat map of all 64 actions | Natural language activity logging |
+
 ## 🛠 Tech Stack
 
-- **Framework:** Next.js 14 (App Router)
-- **Database:** Convex (real-time)
+- **Framework:** Next.js 15 (App Router, React 19)
+- **Database:** Convex (real-time subscriptions)
 - **Auth:** Clerk
-- **AI:** Claude Sonnet 4.5 via Vercel AI SDK
+- **AI:** Claude Sonnet 4.5 via Vercel AI SDK v6
 - **Observability:** Opik by Comet
-- **Styling:** Tailwind CSS + shadcn/ui
+- **Styling:** Tailwind CSS v4 + shadcn/ui
 
 ## 🚀 Getting Started
 
@@ -41,7 +49,7 @@ Polaris is an AI-powered goal coaching app built for the [Encode Club "Commit To
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/polaris.git
+git clone https://github.com/0xSardius/polaris.git
 cd polaris
 
 # Install dependencies
