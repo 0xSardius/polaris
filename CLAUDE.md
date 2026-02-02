@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Current Status (Feb 1, 2026)
+## Current Status (Feb 2, 2026)
 
 **Deployed to Vercel!** Full demo loop tested and working in production.
 
@@ -12,10 +12,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `/check-in` — Natural language input → AI maps to actions → stores in `checkIns` + `actionActivity`
 - **Interactive Mandala** — Click any cell to see details (goal overview, pillar with actions, action with heat/streak)
 - **Ohtani Method Explainer** — Collapsible "How It Works" section in sidebar
+- **Opik Tracing** — AI route observability with fire-and-forget tracing (graceful degradation if no API key)
 - Auth via Clerk, data persisted to Convex
 - Resumable crafting (user can leave and return)
 - Heat system working: activity updates flow through to mandala colors
 - **Production deployment on Vercel** with Convex backend
+
+### Recent Changes (Feb 2)
+- Added Opik tracing to `/api/chat` and `/api/check-in` routes (`src/lib/opik/`)
 
 ### Recent Changes (Feb 1)
 - AI SDK v6 migration for Vercel deployment
@@ -97,6 +101,13 @@ Heat levels: `cold` → `warming` → `warm` → `hot` → `fire`
 - CSS classes: `.heat-cold`, `.heat-warming`, `.heat-warm`, `.heat-hot`, `.heat-fire`
 - Utility functions in `src/lib/utils.ts`: `getHeatLevel()`, `getHeatColor()`, `getHeatScore()`
 
+### Opik Tracing (`src/lib/opik/`)
+Fire-and-forget observability for AI routes:
+- `client.ts` — Safe Opik client with graceful degradation (returns `null` if no `OPIK_API_KEY`)
+- `tracing.ts` — Helper functions: `traceChatRequest()`, `traceCheckInMapping()`
+- All calls wrapped in try/catch, never block or crash the app
+- Traces appear in Opik dashboard when API key is configured
+
 ## Key Patterns
 
 ### Chat with AI (AI SDK v6 pattern)
@@ -143,7 +154,7 @@ Copy `.env.example` to `.env.local`. Required:
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
 - `NEXT_PUBLIC_CONVEX_URL`
 - `ANTHROPIC_API_KEY`
-- `OPIK_API_KEY`, `OPIK_WORKSPACE`, `OPIK_PROJECT_NAME`
+- `OPIK_API_KEY`, `OPIK_PROJECT_NAME` (optional, defaults to "polaris")
 
 ## Git
 
