@@ -40,6 +40,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Unused `framer-motion` dependency (can remove to reduce bundle size)
 - API route has a debug `console.log` — remove before final demo
 
+### Design Decisions & Future Work
+
+**Single Active Goal Model (current):**
+- App supports ONE active goal at a time
+- Goal statuses: `crafting` → `active` → `completed` or `paused`
+- Creating a new goal automatically pauses the previous active goal
+- Paused/completed goals are stored in DB but have NO UI access (no switcher, no history)
+- Sidebar "My Goal" link goes to `/craft` (the creation wizard), not a goal detail view
+
+**Why this works for MVP:**
+- Keeps focus on the Ohtani Method's core value: deep commitment to ONE goal
+- Simplifies UI and reduces scope for hackathon
+
+**Future v2 considerations (if traction):**
+- Goal switcher in sidebar to resume paused goals
+- Goal history/archive view
+- Rename "My Goal" → "Craft Goal" or add goal detail view when active
+- Edit pillars/actions after goal is activated
+- Multiple concurrent goals (though this may conflict with the methodology's philosophy)
+
 See `docs/ARCHITECTURE.md` for system overview and `SCRATCHPAD.md` for session notes.
 
 ## Project Overview
