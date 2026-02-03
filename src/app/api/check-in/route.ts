@@ -19,10 +19,12 @@ export async function POST(req: Request) {
 
   const systemPrompt = ACTION_MAPPING_PROMPT(userInput, actions);
 
+  const startTime = Date.now();
   const result = await generateText({
     model: anthropic("claude-sonnet-4-5"),
     prompt: systemPrompt,
   });
+  const latencyMs = Date.now() - startTime;
 
   const parsed = parseActionMapping(result.text);
 
@@ -36,12 +38,16 @@ export async function POST(req: Request) {
     );
   }
 
-  // Trace successful mapping (fire-and-forget, never blocks or crashes)
+  // Trace successful mapping with full LLM data (fire-and-forget, never blocks or crashes)
   traceCheckInMapping({
     userInput,
     actionCount: actions.length,
     mappedCount: parsed.mappedActionIds.length,
     confidence: parsed.confidence,
+    prompt: systemPrompt,
+    llmResponse: result.text,
+    reasoning: parsed.reasoning,
+    latencyMs,
   });
 
   return Response.json({

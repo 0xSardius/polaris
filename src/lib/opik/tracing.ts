@@ -24,12 +24,16 @@ export function traceChatRequest(data: {
   }
 }
 
-// Trace a check-in mapping (fire-and-forget)
+// Trace a check-in mapping with full LLM data (fire-and-forget)
 export function traceCheckInMapping(data: {
   userInput: string;
   actionCount: number;
   mappedCount: number;
   confidence: number;
+  prompt: string;
+  llmResponse: string;
+  reasoning: string;
+  latencyMs: number;
 }) {
   try {
     const client = getOpikClient();
@@ -37,8 +41,21 @@ export function traceCheckInMapping(data: {
 
     const trace = client.trace({
       name: "check-in:mapping",
-      input: { userInput: data.userInput, actionCount: data.actionCount },
-      output: { mappedCount: data.mappedCount, confidence: data.confidence },
+      input: {
+        userInput: data.userInput,
+        actionCount: data.actionCount,
+        prompt: data.prompt,
+      },
+      output: {
+        mappedCount: data.mappedCount,
+        confidence: data.confidence,
+        reasoning: data.reasoning,
+        llmResponse: data.llmResponse,
+      },
+      metadata: {
+        latencyMs: data.latencyMs,
+        model: "claude-sonnet-4-5",
+      },
     });
 
     trace.end();

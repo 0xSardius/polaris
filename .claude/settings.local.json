@@ -12,7 +12,17 @@
       "Bash(npm run build:*)",
       "Bash(npx tsc:*)",
       "Bash(pnpm add:*)",
-      "Bash(npx convex dev:*)"
+      "Bash(npx convex dev:*)",
+      "Bash(npm run lint)",
+      "Bash(git restore:*)",
+      "Bash(npx convex codegen:*)",
+      "Bash(findstr:*)",
+      "Bash(npm run:*)",
+      "Bash(npx next build)",
+      "WebFetch(domain:sdk.vercel.ai)",
+      "Bash(grep:*)",
+      "WebSearch",
+      "WebFetch(domain:www.comet.com)"
     ]
   }
 }
