@@ -12,14 +12,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `/check-in` — Natural language input → AI maps to actions → stores in `checkIns` + `actionActivity`
 - **Interactive Mandala** — Click any cell to see details (goal overview, pillar with actions, action with heat/streak)
 - **Ohtani Method Explainer** — Collapsible "How It Works" section in sidebar
-- **Opik Tracing** — AI route observability with fire-and-forget tracing (graceful degradation if no API key)
 - Auth via Clerk, data persisted to Convex
 - Resumable crafting (user can leave and return)
 - Heat system working: activity updates flow through to mandala colors
 - **Production deployment on Vercel** with Convex backend
 
 ### Recent Changes (Feb 2)
-- Added Opik tracing to `/api/chat` and `/api/check-in` routes (`src/lib/opik/`)
+- Removed Opik tracing (npm/pnpm conflicts made it not worth the hassle for MVP)
 
 ### Recent Changes (Feb 1)
 - AI SDK v6 migration for Vercel deployment
@@ -86,7 +85,6 @@ npm run lint         # ESLint
 - **Database:** Convex (real-time subscriptions)
 - **Auth:** Clerk (wraps app in `src/app/layout.tsx`)
 - **AI:** Claude via Vercel AI SDK (`@ai-sdk/anthropic`, `ai` packages)
-- **Observability:** Opik by Comet
 - **Styling:** Tailwind CSS v4 with theme defined in `src/app/globals.css` (using `@theme` directive)
 
 ### Data Flow
@@ -105,7 +103,7 @@ npm run lint         # ESLint
 - `checkIns` — Natural language inputs with mapped action IDs
 - `actionActivity` — Individual action completions for heat calculation
 - `chatMessages` — Conversation history by context
-- `coachingInterventions` — AI nudges with outcome tracking (for Opik)
+- `coachingInterventions` — AI nudges with outcome tracking
 
 ### AI Prompts (`src/lib/ai/prompts.ts`)
 Prompts use structured markers for parsing:
@@ -120,13 +118,6 @@ Heat levels: `cold` → `warming` → `warm` → `hot` → `fire`
 - Colors defined in `src/app/globals.css` under `@theme` (e.g., `--color-heat-cold`)
 - CSS classes: `.heat-cold`, `.heat-warming`, `.heat-warm`, `.heat-hot`, `.heat-fire`
 - Utility functions in `src/lib/utils.ts`: `getHeatLevel()`, `getHeatColor()`, `getHeatScore()`
-
-### Opik Tracing (`src/lib/opik/`)
-Fire-and-forget observability for AI routes:
-- `client.ts` — Safe Opik client with graceful degradation (returns `null` if no `OPIK_API_KEY`)
-- `tracing.ts` — Helper functions: `traceChatRequest()`, `traceCheckInMapping()`
-- All calls wrapped in try/catch, never block or crash the app
-- Traces appear in Opik dashboard when API key is configured
 
 ## Key Patterns
 
@@ -174,7 +165,6 @@ Copy `.env.example` to `.env.local`. Required:
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
 - `NEXT_PUBLIC_CONVEX_URL`
 - `ANTHROPIC_API_KEY`
-- `OPIK_API_KEY`, `OPIK_PROJECT_NAME` (optional, defaults to "polaris")
 
 ## Git
 

@@ -5,7 +5,6 @@ import {
   PILLAR_SUGGESTION_PROMPT,
   ACTION_SUGGESTION_PROMPT,
 } from "@/lib/ai/prompts";
-import { traceChatRequest } from "@/lib/opik/tracing";
 
 export const maxDuration = 30;
 
@@ -84,9 +83,6 @@ export async function POST(req: Request) {
 
   // Default to goal_crafting
   context = context || "goal_crafting";
-
-  // Trace the request (fire-and-forget, never blocks or crashes)
-  traceChatRequest({ context, messageCount: messages.length, goal, pillar });
 
   // Select the appropriate system prompt based on context
   let systemPrompt: string;

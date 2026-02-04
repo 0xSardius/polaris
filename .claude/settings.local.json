@@ -22,7 +22,13 @@
       "WebFetch(domain:sdk.vercel.ai)",
       "Bash(grep:*)",
       "WebSearch",
-      "WebFetch(domain:www.comet.com)"
+      "WebFetch(domain:www.comet.com)",
+      "Bash(pnpm install:*)",
+      "Bash(npm view:*)",
+      "Bash(npm search:*)",
+      "Bash(npm info:*)",
+      "Bash(npm show:*)",
+      "Bash(npm cache clean:*)"
     ]
   }
 }
