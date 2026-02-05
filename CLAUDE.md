@@ -17,6 +17,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Heat system working: activity updates flow through to mandala colors
 - **Production deployment on Vercel** with Convex backend
 
+### Recent Changes (Feb 5)
+- Removed unused framer-motion dependency
+- Added pitch deck outline for demo prep
+
 ### Recent Changes (Feb 2)
 - Removed Opik tracing (npm/pnpm conflicts made it not worth the hassle for MVP)
 
@@ -29,15 +33,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Created `docs/ARCHITECTURE.md` with system overview
 
 ### Next Steps
-1. **Demo prep** — Screenshots, demo script for hackathon presentation
+1. **Demo prep** — Fresh goal for demo, pitch deck
 2. **Polish (optional)** — Remove debug console.logs
+
+### Demo Prep
+
+**To start fresh for demo:**
+- Option A: Delete data via Convex Dashboard (goals, pillars, actions, checkIns, actionActivity, chatMessages)
+- Option B: Sign up with a fresh Clerk account
+
+**Pitch Deck Flow:**
+
+| Section | Content |
+|---------|---------|
+| **Problem** | New Year's resolutions fail (92% failure rate). Goals are vague, overwhelming, and lack daily actionability. |
+| **Solution** | Polaris - AI coach that transforms one goal into 64 trackable daily actions using the Ohtani Method |
+| **How It Works** | 1) Chat with AI to clarify your goal → 2) AI suggests 8 pillars (areas of focus) → 3) Each pillar gets 8 concrete actions → 4) Track via mandala heat map |
+| **Core Features** | • AI-guided goal crafting wizard<br>• 9x9 mandala visualization with heat tracking<br>• Natural language check-ins mapped to actions<br>• Real-time progress dashboard |
+| **Tech Stack** | Next.js 15, Convex, Clerk, Claude AI via Vercel AI SDK |
+| **Demo** | Live walkthrough of crafting a goal and checking in |
 
 ### Known Issues
 
 **Low priority:**
 - ESLint version mismatch (eslint-config-next v16 vs Next.js v15)
-- Unused `framer-motion` dependency (can remove to reduce bundle size)
-- API route has a debug `console.log` — remove before final demo
 
 ### Design Decisions & Future Work
 
