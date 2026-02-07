@@ -6,7 +6,16 @@ import { parseActionMapping } from "@/lib/utils";
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json(
+      { error: "Invalid JSON" },
+      { status: 400 }
+    );
+  }
+
   const { userInput, actions } = body;
 
   if (!userInput || !actions || !Array.isArray(actions)) {
@@ -27,10 +36,7 @@ export async function POST(req: Request) {
 
   if (!parsed) {
     return Response.json(
-      {
-        error: "Failed to parse AI response",
-        rawResponse: result.text,
-      },
+      { error: "Failed to parse AI response" },
       { status: 500 }
     );
   }
@@ -39,6 +45,5 @@ export async function POST(req: Request) {
     mappedActionIds: parsed.mappedActionIds,
     confidence: parsed.confidence,
     reasoning: parsed.reasoning,
-    rawResponse: result.text,
   });
 }

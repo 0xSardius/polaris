@@ -35,76 +35,90 @@ function parseContextFromMessage(content: string): {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { messages: rawMessages } = body;
+  try {
+    const body = await req.json();
+    const { messages: rawMessages } = body;
 
-  // Convert v6 UI messages (with parts) to model messages (with content string)
-  const messages = rawMessages.map((msg: {
-    role: string;
-    content?: string;
-    parts?: Array<{ type: string; text?: string }>;
-  }) => {
-    if (typeof msg.content === "string") {
-      return { role: msg.role, content: msg.content };
+    if (!Array.isArray(rawMessages)) {
+      return Response.json(
+        { error: "Invalid messages format" },
+        { status: 400 }
+      );
     }
-    const textContent = msg.parts
-      ?.filter((p) => p.type === "text" && p.text)
-      .map((p) => p.text)
-      .join("") || "";
-    return { role: msg.role, content: textContent };
-  });
 
-  // Try to get context from body first (AI SDK may pass it)
-  let context =
-    body.data?.context ||
-    body.context ||
-    body.options?.body?.context;
+    // Convert v6 UI messages (with parts) to model messages (with content string)
+    const messages = rawMessages.map((msg: {
+      role: "user" | "assistant" | "system";
+      content?: string;
+      parts?: Array<{ type: string; text?: string }>;
+    }) => {
+      if (typeof msg.content === "string") {
+        return { role: msg.role, content: msg.content };
+      }
+      const textContent = msg.parts
+        ?.filter((p) => p.type === "text" && p.text)
+        .map((p) => p.text)
+        .join("") || "";
+      return { role: msg.role, content: textContent };
+    });
 
-  let goal =
-    body.data?.goal ||
-    body.goal ||
-    body.options?.body?.goal;
+    // Try to get context from body first (AI SDK may pass it)
+    let context =
+      body.data?.context ||
+      body.context ||
+      body.options?.body?.context;
 
-  let pillar =
-    body.data?.pillar ||
-    body.pillar ||
-    body.options?.body?.pillar;
+    let goal =
+      body.data?.goal ||
+      body.goal ||
+      body.options?.body?.goal;
 
-  // If context not in body, parse from first user message
-  if (!context && messages.length > 0) {
-    const firstUserMessage = messages.find((m: { role: string }) => m.role === "user");
-    if (firstUserMessage) {
-      const parsed = parseContextFromMessage(firstUserMessage.content);
-      context = parsed.context;
-      goal = goal || parsed.goal;
-      pillar = pillar || parsed.pillar;
+    let pillar =
+      body.data?.pillar ||
+      body.pillar ||
+      body.options?.body?.pillar;
+
+    // If context not in body, parse from first user message
+    if (!context && messages.length > 0) {
+      const firstUserMessage = messages.find((m: { role: string }) => m.role === "user");
+      if (firstUserMessage) {
+        const parsed = parseContextFromMessage(firstUserMessage.content);
+        context = parsed.context;
+        goal = goal || parsed.goal;
+        pillar = pillar || parsed.pillar;
+      }
     }
+
+    // Default to goal_crafting
+    context = context || "goal_crafting";
+
+    // Select the appropriate system prompt based on context
+    let systemPrompt: string;
+
+    switch (context) {
+      case "pillar_crafting":
+        systemPrompt = PILLAR_SUGGESTION_PROMPT(goal || "your goal", undefined);
+        break;
+      case "action_crafting":
+        systemPrompt = ACTION_SUGGESTION_PROMPT(goal || "your goal", pillar || "this pillar");
+        break;
+      case "goal_crafting":
+      default:
+        systemPrompt = GOAL_CRAFTING_PROMPT;
+        break;
+    }
+
+    const result = await streamText({
+      model: anthropic("claude-sonnet-4-5"),
+      system: systemPrompt,
+      messages,
+    });
+
+    return result.toUIMessageStreamResponse();
+  } catch (error) {
+    return Response.json(
+      { error: error instanceof SyntaxError ? "Invalid JSON" : "Internal server error" },
+      { status: error instanceof SyntaxError ? 400 : 500 }
+    );
   }
-
-  // Default to goal_crafting
-  context = context || "goal_crafting";
-
-  // Select the appropriate system prompt based on context
-  let systemPrompt: string;
-
-  switch (context) {
-    case "pillar_crafting":
-      systemPrompt = PILLAR_SUGGESTION_PROMPT(goal || "your goal", undefined);
-      break;
-    case "action_crafting":
-      systemPrompt = ACTION_SUGGESTION_PROMPT(goal || "your goal", pillar || "this pillar");
-      break;
-    case "goal_crafting":
-    default:
-      systemPrompt = GOAL_CRAFTING_PROMPT;
-      break;
-  }
-
-  const result = await streamText({
-    model: anthropic("claude-sonnet-4-5"),
-    system: systemPrompt,
-    messages,
-  });
-
-  return result.toUIMessageStreamResponse();
 }

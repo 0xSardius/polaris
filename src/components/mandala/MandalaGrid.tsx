@@ -1,7 +1,7 @@
 "use client";
 
 import { Id } from "@convex/_generated/dataModel";
-import { cn, getHeatLevel, HeatLevel } from "@/lib/utils";
+import { cn, getHeatLevel, getDaysSince, HeatLevel } from "@/lib/utils";
 import { useState } from "react";
 
 type PillarData = {
@@ -70,11 +70,6 @@ const ACTION_OFFSETS: Record<number, { row: number; col: number }> = {
 
 function getHeatClass(heat: HeatLevel): string {
   return `heat-${heat}`;
-}
-
-function getDaysSince(timestamp: number | undefined): number {
-  if (!timestamp) return Infinity;
-  return Math.floor((Date.now() - timestamp) / (24 * 60 * 60 * 1000));
 }
 
 export function MandalaGrid({
