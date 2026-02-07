@@ -2,7 +2,7 @@
 
 > Your AI guide to achieving your North Star
 
-Transform one ambitious goal into 64 daily actions using the Ohtani/Harada Method. Track progress with an AI coach that adapts.
+Transform one ambitious goal into 64 tangible actions using the Ohtani/Harada Method. Track progress with an AI coach that adapts.
 
 **[Live Demo](https://polaris-rho-hazel.vercel.app)** | [GitHub](https://github.com/0xSardius/polaris)
 
@@ -20,7 +20,6 @@ Polaris is an AI-powered goal coaching app built for the [Encode Club "Commit To
 - **Visual Mandala** — 9x9 heat map showing your progress across all 64 actions
 - **Natural Language Check-ins** — Just tell Polaris what you did, it maps to your actions automatically
 - **Adaptive Coaching** — AI notices patterns, celebrates streaks, nudges cold pillars
-- **Opik Observability** — Full tracing of coaching effectiveness for continuous improvement
 
 ## 📸 Screenshots
 
