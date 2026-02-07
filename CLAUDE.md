@@ -2,9 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Current Status (Feb 2, 2026)
+## Current Status (Feb 6, 2026)
 
-**Deployed to Vercel!** Full demo loop tested and working in production.
+**Submitted to Encode Club "Commit To Change" Hackathon.** Deployed, demo recorded, pitch delivered.
+
+### One-Liner
+Your AI-powered Ohtani Method — one goal, 64 actionable habits, built in minutes.
 
 ### What's Working
 - `/craft` — Single-page wizard: Goal chat → Pillars (AI suggests 8, editable) → Actions (8 per pillar, AI suggests)
@@ -17,41 +20,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Heat system working: activity updates flow through to mandala colors
 - **Production deployment on Vercel** with Convex backend
 
-### Recent Changes (Feb 5)
-- Removed unused framer-motion dependency
-- Added pitch deck outline for demo prep
+### Final Changes (Feb 6)
+- Hardened API routes: try-catch in `/api/chat` and `/api/check-in`
+- Removed raw AI response from error payloads (security)
+- Removed duplicate `getDaysSince()` from MandalaGrid (imports from utils)
+- Finalized pitch deck and demo script (`docs/PITCH.md`)
 
-### Recent Changes (Feb 2)
-- Removed Opik tracing (npm/pnpm conflicts made it not worth the hassle for MVP)
-
-### Recent Changes (Feb 1)
-- AI SDK v6 migration for Vercel deployment
-- Added `MandalaDetailModal` — click cells to view full details
-- Added "The Ohtani Method" explainer in sidebar
-- Fixed mandala overlay/z-index issues
-- Fixed Convex auth (`CLERK_JWT_ISSUER_DOMAIN` without `https://` prefix)
-- Created `docs/ARCHITECTURE.md` with system overview
-
-### Next Steps
-1. **Demo prep** — Fresh goal for demo, pitch deck
-2. **Polish (optional)** — Remove debug console.logs
-
-### Demo Prep
-
-**To start fresh for demo:**
-- Option A: Delete data via Convex Dashboard (goals, pillars, actions, checkIns, actionActivity, chatMessages)
-- Option B: Sign up with a fresh Clerk account
-
-**Pitch Deck Flow:**
-
-| Section | Content |
-|---------|---------|
-| **Problem** | New Year's resolutions fail (92% failure rate). Goals are vague, overwhelming, and lack daily actionability. |
-| **Solution** | Polaris - AI coach that transforms one goal into 64 trackable daily actions using the Ohtani Method |
-| **How It Works** | 1) Chat with AI to clarify your goal → 2) AI suggests 8 pillars (areas of focus) → 3) Each pillar gets 8 concrete actions → 4) Track via mandala heat map |
-| **Core Features** | • AI-guided goal crafting wizard<br>• 9x9 mandala visualization with heat tracking<br>• Natural language check-ins mapped to actions<br>• Real-time progress dashboard |
-| **Tech Stack** | Next.js 15, Convex, Clerk, Claude AI via Vercel AI SDK |
-| **Demo** | Live walkthrough of crafting a goal and checking in |
+### Previous Changes
+- *Feb 5:* Removed unused framer-motion, added pitch deck outline
+- *Feb 2:* Removed Opik tracing (npm/pnpm conflicts)
+- *Feb 1:* AI SDK v6 migration, MandalaDetailModal, Ohtani explainer, Convex auth fix, `docs/ARCHITECTURE.md`
 
 ### Known Issues
 
@@ -72,13 +50,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Simplifies UI and reduces scope for hackathon
 
 **Future v2 considerations (if traction):**
+- **Adaptive coaching loop** — AI notices cold pillars, intervenes with nudges, adapts strategy based on patterns (this is the defensible moat)
 - Goal switcher in sidebar to resume paused goals
 - Goal history/archive view
-- Rename "My Goal" → "Craft Goal" or add goal detail view when active
 - Edit pillars/actions after goal is activated
 - Multiple concurrent goals (though this may conflict with the methodology's philosophy)
+- Remove remaining `console.error()` calls in craft page and user-sync
+- Consider env var for model name instead of hardcoded `claude-sonnet-4-5`
 
-See `docs/ARCHITECTURE.md` for system overview and `SCRATCHPAD.md` for session notes.
+See `docs/ARCHITECTURE.md` for system overview, `docs/PITCH.md` for pitch deck & demo script, and `SCRATCHPAD.md` for session notes.
 
 ## Project Overview
 
