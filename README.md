@@ -21,19 +21,12 @@ Polaris is an AI-powered goal coaching app built for the [Encode Club "Commit To
 - **Natural Language Check-ins** — Just tell Polaris what you did, it maps to your actions automatically
 - **Adaptive Coaching** — AI notices patterns, celebrates streaks, nudges cold pillars
 
-## 📸 Screenshots
-
-| Goal Crafting | Mandala Dashboard | Check-in |
-|:---:|:---:|:---:|
-| AI guides you through defining your goal | Visual heat map of all 64 actions | Natural language activity logging |
-
 ## 🛠 Tech Stack
 
 - **Framework:** Next.js 15 (App Router, React 19)
 - **Database:** Convex (real-time subscriptions)
 - **Auth:** Clerk
 - **AI:** Claude Sonnet 4.5 via Vercel AI SDK v6
-- **Observability:** Opik by Comet
 - **Styling:** Tailwind CSS v4 + shadcn/ui
 
 ## 🚀 Getting Started
@@ -42,7 +35,7 @@ Polaris is an AI-powered goal coaching app built for the [Encode Club "Commit To
 
 - Node.js 18+
 - npm or yarn
-- Accounts: [Clerk](https://clerk.com), [Convex](https://convex.dev), [Anthropic](https://anthropic.com), [Comet/Opik](https://comet.com)
+- Accounts: [Clerk](https://clerk.com), [Convex](https://convex.dev), [Anthropic](https://anthropic.com)
 
 ### Installation
 
